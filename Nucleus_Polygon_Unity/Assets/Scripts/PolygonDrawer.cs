@@ -27,10 +27,15 @@ public class PolygonDrawer : MonoBehaviour {
 		return Instantiate (topPrefab, new Vector3 (x, y, 0f), Quaternion.identity) as GameObject;
 	}
 
-	public void DrawLine(Vector3 one, Vector3 two){
+	public void DrawLine(Vector3 one, Vector3 two, Color color, float width){
 		GameObject renderObj = Instantiate (lineRenderPrefab) as GameObject;
 		LineRenderer renderer = renderObj.GetComponent<LineRenderer> ();
 		renderer.SetPosition (0, one);
 		renderer.SetPosition (1, two);
+		renderer.startColor = color;
+		renderer.endColor = color;
+
+		renderer.startWidth = width;
+		renderer.endWidth = width;
 	}
 }
