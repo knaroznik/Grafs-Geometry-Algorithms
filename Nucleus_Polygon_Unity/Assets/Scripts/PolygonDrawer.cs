@@ -12,10 +12,8 @@ public class PolygonDrawer : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Polygon pol = new Polygon (this, userTops);
-		pol.findBot ();
-		pol.findTop ();
 
-		if (pol.HaveKernel ()) {
+		if (!pol.HaveKernel ()) {
 			Debug.Log ("Nie ma jądra");
 		} else {
 			pol.calculateCircuit ();
@@ -23,7 +21,7 @@ public class PolygonDrawer : MonoBehaviour {
 		}
 	}
 
-	public GameObject DrawTop(int x, int y){
+	public GameObject DrawTop(float x, float y){
 		return Instantiate (topPrefab, new Vector3 (x, y, 0f), Quaternion.identity) as GameObject;
 	}
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class UnityDot : Dot {
 
-	public UnityDot(int _x, int _y, GameObject _obj) : base(_x, _y)
+	public UnityDot(float _x, float _y, GameObject _obj) : base(_x, _y)
 	{
 		this.obj = _obj;
 	}

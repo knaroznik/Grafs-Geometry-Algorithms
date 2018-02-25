@@ -149,14 +149,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   userTops:
+  - x: 0
+    y: 0
   - x: -4
     y: -4
+  - x: -4
+    y: 2
   - x: -2
+    y: -1
+  - x: 1
     y: 2
-  - x: 5
-    y: 2
-  - x: 5
-    y: -4
   - x: 1
     y: -4
   topPrefab: {fileID: 1867890583090900, guid: c877611195651db4b837f440659b509f, type: 2}

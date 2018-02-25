@@ -5,11 +5,16 @@ using UnityEngine;
 [System.Serializable]
 public class Dot {
 
-	public Dot(int _x, int _y){
+	public Dot(float _x, float _y){
 		x = _x;
 		y = _y;
 	}
 
-	public int x;
-	public int y;
+	public float x;
+	public float y;
+
+	public override string ToString ()
+	{
+		return x.ToString () + "," + y.ToString ();
+	}
 }
