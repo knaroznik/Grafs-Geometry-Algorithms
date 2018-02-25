@@ -8,6 +8,7 @@ public class PolygonDrawer : MonoBehaviour {
 
 	public GameObject topPrefab;
 	public GameObject lineRenderPrefab;
+	public GameObject importantPrefab;
 
 	// Use this for initialization
 	void Start () {
@@ -23,6 +24,10 @@ public class PolygonDrawer : MonoBehaviour {
 
 	public GameObject DrawTop(float x, float y){
 		return Instantiate (topPrefab, new Vector3 (x, y, 0f), Quaternion.identity) as GameObject;
+	}
+
+	public void DrawImportantObject(float x, float y){
+		Instantiate (importantPrefab, new Vector3 (x, y, 0f), Quaternion.identity);
 	}
 
 	public void DrawLine(Vector3 one, Vector3 two, Color color, float width){

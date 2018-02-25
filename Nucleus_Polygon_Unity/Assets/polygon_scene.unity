@@ -164,6 +164,8 @@ MonoBehaviour:
   topPrefab: {fileID: 1867890583090900, guid: c877611195651db4b837f440659b509f, type: 2}
   lineRenderPrefab: {fileID: 1059692284094978, guid: 04f641ca9c65ce24082e78a831e37888,
     type: 2}
+  importantPrefab: {fileID: 1916806724135052, guid: 2d457a744b8636e4eb377d3dfbac8894,
+    type: 2}
 --- !u!1 &1095966194
 GameObject:
   m_ObjectHideFlags: 0

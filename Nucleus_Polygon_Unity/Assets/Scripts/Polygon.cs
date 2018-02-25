@@ -5,12 +5,14 @@ using UnityEngine;
 public class Polygon {
 	
 	public List<UnityDot> tops;
+	PolygonDrawer drawer;
 
 	Dot getDot(int i){
 		return tops [(i % tops.Count + tops.Count)%tops.Count] as Dot;
 	}
 
 	public Polygon(PolygonDrawer drawer, List<Dot> dots){
+		this.drawer = drawer;
 		tops = new List<UnityDot> ();
 		Debug.DrawLine(Vector3.zero, new Vector3(5, 0, 0), Color.red);
 		for (int i = 0; i < dots.Count; i++) {
@@ -76,6 +78,7 @@ public class Polygon {
 				}
 			}
 		}
+		drawer.DrawImportantObject (max.x, max.y);
 	}
 
 	void calculateMin(){
@@ -94,6 +97,7 @@ public class Polygon {
 				}
 			}
 		}
+		drawer.DrawImportantObject (min.x, min.y);
 	}
 
 	public void calculateCircuit(){
