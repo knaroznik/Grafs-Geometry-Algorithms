@@ -33,9 +33,7 @@ public class Polygon {
 	{
 		int polygonLength = tops.Count, i=0;
 		bool inside = false;
-		// x, y for tested point.
 		float pointX = point.x, pointY = point.y;
-		// start / end point for the current polygon segment.
 		float startX, startY, endX, endY;
 		Dot endPoint = tops[polygonLength-1];           
 		endX = endPoint.x; 
@@ -44,9 +42,8 @@ public class Polygon {
 			startX = endX;           startY = endY;
 			endPoint = tops[i++];
 			endX = endPoint.x;       endY = endPoint.y;
-			//
-			inside ^= ( endY > pointY ^ startY > pointY ) /* ? pointY inside [startY;endY] segment ? */
-				&& /* if so, test if it is under the segment */
+			inside ^= ( endY > pointY ^ startY > pointY )
+				&&
 				( (pointX - endX) < (pointY - endY) * (startX - endX) / (startY - endY) ) ;
 		}
 		return inside;
@@ -78,6 +75,16 @@ public class Polygon {
 				}
 			}
 		}
+
+		if (max == null) {
+			max = tops [0];
+			for (int i = 1; i < tops.Count; i++) {
+				if (tops [i].y < max.y) {
+					max = tops [i];
+				}
+			}
+		}
+
 		drawer.DrawImportantObject (max.x, max.y);
 	}
 
@@ -97,6 +104,16 @@ public class Polygon {
 				}
 			}
 		}
+
+		if (min == null) {
+			min = tops [0];
+			for (int i = 1; i < tops.Count; i++) {
+				if (tops [i].y > min.y) {
+					min = tops [i];
+				}
+			}
+		}
+
 		drawer.DrawImportantObject (min.x, min.y);
 	}
 
