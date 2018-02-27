@@ -10,7 +10,7 @@ public class PolygonDrawer : MonoBehaviour {
 	public GameObject lineRenderPrefab;
 	public GameObject importantPrefab;
 
-	private GameObject scenePolygon;
+	protected GameObject scenePolygon;
 
 	// Use this for initialization
 	void Start () {

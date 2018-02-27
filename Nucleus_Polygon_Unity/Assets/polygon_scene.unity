@@ -403,7 +403,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 50
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -426,7 +426,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1167951720}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -100}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -553,6 +553,8 @@ MonoBehaviour:
   polygons:
   - {fileID: 1740121332571974, guid: 4db791a3613d50b4db4bdcbb24ce0514, type: 2}
   - {fileID: 1415504169489620, guid: cddb8b29a9eb8854c867c309a1dc229a, type: 2}
+  - {fileID: 1316997192417738, guid: 4db623941932578439e73b5c8fae7c06, type: 2}
+  - {fileID: 1740121332571974, guid: bf9f4156abf14ff4497966bd38ef11a3, type: 2}
   buttonPrefab: {fileID: 1531158849520180, guid: a7856a9d73d5a874cb91d6a0753077f2,
     type: 2}
   canvasPanel: {fileID: 1510101201}

@@ -12,11 +12,14 @@ public class SceneBehaviour : MonoBehaviour {
 
 	private GameObject currentPolygon;
 
+	GameObject obj;
+	Button but;
+
 	void Start(){
 		for (int i = 0; i < polygons.Count; i++) {
-			GameObject obj = Instantiate (buttonPrefab, canvasPanel) as GameObject;
+			obj = Instantiate (buttonPrefab, canvasPanel) as GameObject;
 			obj.GetComponentInChildren<Text> ().text = polygons [i].name;
-			Button but = obj.GetComponent<Button> ();
+			but = obj.GetComponent<Button> ();
 			GameObject x = polygons[i];
 			but.onClick.AddListener (delegate {
 				if(currentPolygon != null){
@@ -25,5 +28,14 @@ public class SceneBehaviour : MonoBehaviour {
 				currentPolygon = Instantiate(x) as GameObject;
 			});
 		}
+
+		//Exit button : 
+
+		obj = Instantiate (buttonPrefab, canvasPanel) as GameObject;
+		obj.GetComponentInChildren<Text> ().text = "EXIT";
+		but = obj.GetComponent<Button> ();
+		but.onClick.AddListener (delegate {
+			Application.Quit();
+		});
 	}
 }

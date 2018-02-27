@@ -5,9 +5,9 @@ using UnityEngine;
 public class Polygon {
 	
 	public List<UnityDot> tops;
-	PolygonDrawer drawer;
+	protected PolygonDrawer drawer;
 
-	Dot getDot(int i){
+	protected Dot getDot(int i){
 		return tops [(i % tops.Count + tops.Count)%tops.Count] as Dot;
 	}
 
@@ -18,18 +18,18 @@ public class Polygon {
 		for (int i = 0; i < dots.Count; i++) {
 			tops.Add (new UnityDot (dots [i].x, dots [i].y, drawer.DrawTop (dots [i].x, dots [i].y)));
 			if(i==dots.Count-1){
-				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [0].x, dots [0].y, 0f), Color.white, 0.1f);
+				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [0].x, dots [0].y, 0f), Color.white, 1f);
 			}
 			else{
-				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [(i+1)].x, dots [(i+1)].y, 0f), Color.white, 0.1f);
+				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [(i+1)].x, dots [(i+1)].y, 0f), Color.white, 1f);
 			}
 		}
 	}
 
-	Dot max;
-	Dot min;
+	protected Dot max;
+	protected Dot min;
 
-	bool isInside(Dot point)
+	protected bool isInside(Dot point)
 	{
 		int polygonLength = tops.Count, i=0;
 		bool inside = false;
@@ -59,7 +59,7 @@ public class Polygon {
 		return true;
 	}
 
-	void calculateMax(){
+	protected void calculateMax(){
 		for (int i = 0; i < tops.Count; i++) {
 			Dot center = tops [i];
 			Dot prev = getDot (i - 1);
@@ -88,7 +88,7 @@ public class Polygon {
 		drawer.DrawImportantObject (max.x, max.y);
 	}
 
-	void calculateMin(){
+	protected void calculateMin(){
 		for (int i = 0; i < tops.Count; i++) {
 			Dot center = tops [i];
 			Dot prev = getDot (i - 1);
