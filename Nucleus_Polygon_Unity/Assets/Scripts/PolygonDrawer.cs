@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PolygonDrawer : MonoBehaviour {
 
@@ -11,18 +12,24 @@ public class PolygonDrawer : MonoBehaviour {
 	public GameObject importantPrefab;
 
 	protected GameObject scenePolygon;
+	protected SceneBehaviour sceneBehaviour;
 
 	// Use this for initialization
 	void Start () {
 		scenePolygon = new GameObject ();
 		scenePolygon.name = this.name + " polygon";
+		sceneBehaviour = FindObjectOfType<SceneBehaviour> ();
 		Polygon pol = new Polygon (this, userTops);
 
-		if (!pol.HaveKernel ()) {
-			Debug.Log ("Nie ma jądra");
-		} else {
+		bool hasKernel = pol.HaveKernel ();
+		SetKernelText (hasKernel);
+
+		if (hasKernel) {
 			pol.calculateCircuit ();
 			pol.calculateArea ();
+		} else {
+			SetAreaText (-1);
+			SetCircuitText (-1);
 		}
 	}
 
@@ -49,5 +56,22 @@ public class PolygonDrawer : MonoBehaviour {
 	public void Clear(){
 		Destroy (scenePolygon);
 		Destroy (this.gameObject);
+	}
+
+
+	public void SetKernelText(bool _hasKernel){
+		if (_hasKernel) {
+			sceneBehaviour.kernelFound.GetComponent<Text> ().text = "Kernel found";
+		} else {
+			sceneBehaviour.kernelFound.GetComponent<Text> ().text = "Kernel not found";
+		}
+	}
+
+	public void SetCircuitText(float circuit){
+		sceneBehaviour.circuit.GetComponent<Text> ().text = "Circuit : " + circuit;
+	}
+
+	public void SetAreaText(float area){
+		sceneBehaviour.area.GetComponent<Text> ().text = "Area : " + area;
 	}
 }

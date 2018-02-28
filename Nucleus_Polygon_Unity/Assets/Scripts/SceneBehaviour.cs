@@ -15,6 +15,12 @@ public class SceneBehaviour : MonoBehaviour {
 	GameObject obj;
 	Button but;
 
+	[Header("Texts")]
+
+	public GameObject kernelFound;
+	public GameObject circuit;
+	public GameObject area;
+
 	void Start(){
 		for (int i = 0; i < polygons.Count; i++) {
 			obj = Instantiate (buttonPrefab, canvasPanel) as GameObject;

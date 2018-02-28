@@ -12,11 +12,13 @@ public class firstV_Polygon : PolygonDrawer {
 
 		scenePolygon = new GameObject ();
 		scenePolygon.name = this.name + " polygon";
+		sceneBehaviour = FindObjectOfType<SceneBehaviour> ();
 		Polygon pol = new Polygon (this, calculatedTops);
 
-		if (!pol.HaveKernel ()) {
-			Debug.Log ("Nie ma jądra");
-		} else {
+		bool hasKernel = pol.HaveKernel ();
+		SetKernelText (hasKernel);
+
+		if (hasKernel) {
 			pol.calculateCircuit ();
 			pol.calculateArea ();
 		}
