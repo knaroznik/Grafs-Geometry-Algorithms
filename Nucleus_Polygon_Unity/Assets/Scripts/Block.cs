@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Block {
 
-	public UnityDot pointA;
-	public UnityDot pointB;
+	public Dot pointA;
+	public Dot pointB;
+
+	public Block(Dot a, Dot b){
+		pointA = a;
+		pointB = b;
+	}
 }

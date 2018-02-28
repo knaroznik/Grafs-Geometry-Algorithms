@@ -9,6 +9,19 @@ public class Polygon {
 	public List<UnityDot> tops;
 	protected PolygonDrawer drawer;
 
+	protected Dot max;
+	protected Dot min;
+
+	protected Dot x;
+	protected Dot y;
+	protected Dot g;
+	protected Dot z;
+
+	protected bool maxInPolygon;
+	protected bool minInPolygon;
+	protected bool minIsOnePoint = false;
+	protected bool maxIsOnePoint = false;
+
 	protected Dot getDot(int i){
 		return tops [(i % tops.Count + tops.Count)%tops.Count] as Dot;
 	}
@@ -26,12 +39,6 @@ public class Polygon {
 			}
 		}
 	}
-
-	protected Dot max;
-	protected Dot min;
-
-	protected bool maxInPolygon;
-	protected bool minInPolygon;
 
 	protected bool isInside(Dot point)
 	{
@@ -90,7 +97,6 @@ public class Polygon {
 			}
 			maxInPolygon = true;
 		}
-
 		drawer.DrawImportantObject (max.x, max.y);
 	}
 
@@ -152,27 +158,68 @@ public class Polygon {
 		calculatePoints ();
 		drawer.SetCircuitText (1);
 	}
-
-	protected Dot x;
-	protected Dot y;
-	protected Dot g;
-	protected Dot z;
-
+		
 	protected void calculatePoints(){
-		if (x == null) {
-			//TODO : znaleźć punkty najbliżej po prawej (min) i przecięcie prostej 
+		if (y == null && !maxIsOnePoint) {
+			Dot up = new Dot(999,999);
+			Dot down = new Dot(999,999);
+			for (int i = 0; i < tops.Count; i++) {
+				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x > max.x) {
+					up = tops [i];
+				}
+
+				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x > max.x) {
+					down = tops [i];
+				}
+			}
+			// y = przecięcie prostej(up+down, min+min+10)
 		}
 
-		if (y == null) {
-			//TODO : znaleźć punkty najbliżej po lewej (min) i przecięcie prostej 
+		if (x == null) {
+			Dot up = new Dot(999,999);
+			Dot down = new Dot(999,999);
+			for (int i = 0; i < tops.Count; i++) {
+				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x < max.x) {
+					up = tops [i];
+				}
+
+				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x < max.x) {
+					down = tops [i];
+				}
+			}
+			// x = przecięcie prostej(up+down, min+min+10)
+		}
+
+		if (z == null && !minIsOnePoint) {
+			Dot up = new Dot(-999,-999);
+			Dot down = new Dot(999,999);
+			for (int i = 0; i < tops.Count; i++) {
+				if (tops [i].y > min.y && Geometry.distance(tops[i], min) < Geometry.distance(up, min) && tops[i].x > min.x) {
+					up = tops [i];
+				}
+
+				if (tops [i].y < min.y && Geometry.distance(tops[i], min) < Geometry.distance(down, min) && tops[i].x > min.x) {
+					down = tops [i];
+				}
+			}
+			z = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (min.x + 1, min.y)));
+			drawer.DrawImportantObject (z.x, z.y);
 		}
 
 		if (g == null) {
-			//TODO : znaleźć punkty najbliżej po prawej (max) i przecięcie prostej 
-		}
+			Dot up = new Dot(-999,-999);
+			Dot down = new Dot(999,999);
+			for (int i = 0; i < tops.Count; i++) {
+				if (tops [i].y > min.y && Geometry.distance(tops[i], min) < Geometry.distance(up, min) && tops[i].x < min.x) {
+					up = tops [i];
+				}
 
-		if (z == null) {
-			//TODO : znaleźć punkty najbliżej po lewej (max) i przecięcie prostej 
+				if (tops [i].y < min.y && Geometry.distance(tops[i], min) < Geometry.distance(down, min) && tops[i].x < min.x) {
+					down = tops [i];
+				}
+			}
+			g = Geometry.pointofIntersection (new Block (new Dot (min.x + 1, min.y), min), new Block (down, up));
+			drawer.DrawImportantObject (g.x, g.y);
 		}
 
 		//TODO : Połączyć wszystko ze sobą i przekazać do funkcji circuit
@@ -186,6 +233,14 @@ public class Polygon {
 				search.Add (tops [i]);
 			}
 		}
+
+		if (search.Count == 1) {
+			g = search [0];
+			minIsOnePoint = true;
+			return;
+		}
+
+
 		Dot q;
 		Dot w;
 		float prev_count = 0;
@@ -220,6 +275,13 @@ public class Polygon {
 				search.Add (tops [i]);
 			}
 		}
+
+		if (search.Count == 1) {
+			maxIsOnePoint = true;
+			x = search [0];
+			return;
+		}
+
 		Dot q;
 		Dot w;
 		float prev_count = 0;
