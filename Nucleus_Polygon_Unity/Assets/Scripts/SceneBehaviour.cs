@@ -19,7 +19,6 @@ public class SceneBehaviour : MonoBehaviour {
 
 	public GameObject kernelFound;
 	public GameObject circuit;
-	public GameObject area;
 
 	void Start(){
 		for (int i = 0; i < polygons.Count; i++) {

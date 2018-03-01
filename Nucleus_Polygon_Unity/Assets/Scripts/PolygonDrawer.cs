@@ -11,6 +11,8 @@ public class PolygonDrawer : MonoBehaviour {
 	public GameObject lineRenderPrefab;
 	public GameObject importantPrefab;
 
+	public List<Dot> debug;
+
 	protected GameObject scenePolygon;
 	protected SceneBehaviour sceneBehaviour;
 
@@ -27,7 +29,6 @@ public class PolygonDrawer : MonoBehaviour {
 		if (hasKernel) {
 			pol.calculateCircuit ();
 		} else {
-			SetAreaText (-1);
 			SetCircuitText (-1);
 		}
 	}
@@ -52,6 +53,18 @@ public class PolygonDrawer : MonoBehaviour {
 		renderer.endWidth = width;
 	}
 
+	public void DrawLine(Dot one, Dot two, Color color, float width){
+		GameObject renderObj = Instantiate (lineRenderPrefab, scenePolygon.transform) as GameObject;
+		LineRenderer renderer = renderObj.GetComponent<LineRenderer> ();
+		renderer.SetPosition (0, new Vector3(one.x, one.y, 0f));
+		renderer.SetPosition (1, new Vector3(two.x, two.y, 0f));
+		renderer.startColor = color;
+		renderer.endColor = color;
+
+		renderer.startWidth = width;
+		renderer.endWidth = width;
+	}
+
 	public void Clear(){
 		Destroy (scenePolygon);
 		Destroy (this.gameObject);
@@ -68,9 +81,5 @@ public class PolygonDrawer : MonoBehaviour {
 
 	public void SetCircuitText(float circuit){
 		sceneBehaviour.circuit.GetComponent<Text> ().text = "Circuit : " + circuit;
-	}
-
-	public void SetAreaText(float area){
-		sceneBehaviour.area.GetComponent<Text> ().text = "Area : " + area;
 	}
 }

@@ -13,6 +13,8 @@ public class Polygon {
 	protected Dot max;
 	protected Dot min;
 
+	public List<Dot> circuit = new List<Dot> ();
+
 	protected Dot x;
 	protected Dot y;
 	protected Dot g;
@@ -146,7 +148,6 @@ public class Polygon {
 		if (minInPolygon) {
 			findMinPointsOnPolygon ();
 			calculatePoints ();
-			drawer.SetCircuitText (100);
 			return;
 		}
 
@@ -171,7 +172,7 @@ public class Polygon {
 			Dot up = new Dot(999,999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x >= max.x) {
+				if (tops [i].y > max.y && (Mathf.Abs(tops[i].y-max.y)) < (Mathf.Abs(up.y-max.y)) && tops[i].x >= max.x) {
 					up = tops [i];
 				}
 
@@ -188,11 +189,11 @@ public class Polygon {
 			Dot up = new Dot(999,999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x <= max.x) {
+				if (tops [i].y > max.y && (Mathf.Abs(tops[i].y-max.y)) < (Mathf.Abs(up.y-max.y)) && tops[i].x <= max.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x <= max.x) {
+				if (tops [i].y < max.y && (Mathf.Abs(tops[i].y-max.y)) < (Mathf.Abs(up.y-max.y)) && tops[i].x <= max.x) {
 					down = tops [i];
 				}
 			}
@@ -201,15 +202,15 @@ public class Polygon {
 			drawer.DrawImportantObject (x.x, x.y);
 		}
 
-		if (z == null && !minIsOnePoint) {
+		if (z == null && !minIsOnePoint){
 			Dot up = new Dot(-999,-999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > min.y && Geometry.distance(tops[i], min) < Geometry.distance(up, min) && tops[i].x > min.x) {
+				if (tops [i].y > min.y && (Mathf.Abs(tops[i].y-min.y)) < (Mathf.Abs(up.y-min.y)) && tops[i].x > min.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < min.y && Geometry.distance(tops[i], min) < Geometry.distance(down, min) && tops[i].x > min.x) {
+				if (tops [i].y < min.y && (Mathf.Abs(Mathf.Abs(tops[i].y)-Mathf.Abs(min.y))) < (Mathf.Abs((Mathf.Abs(up.y)-Mathf.Abs(min.y)))) && tops[i].x > min.x) {
 					down = tops [i];
 				}
 			}
@@ -222,31 +223,41 @@ public class Polygon {
 			Dot up = new Dot(-999,-999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > min.y && Geometry.distance(tops[i], min) < Geometry.distance(up, min) && tops[i].x <= min.x) {
+				if (tops [i].y > min.y && (Mathf.Abs(tops[i].y-min.y)) < (Mathf.Abs(up.y-min.y)) && tops[i].x <= min.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < min.y && Geometry.distance(tops[i], min) < Geometry.distance(down, min) && tops[i].x <= min.x) {
+				if (tops [i].y < min.y && (Mathf.Abs(tops[i].y-min.y)) < (Mathf.Abs(up.y-min.y)) && tops[i].x <= min.x) {
 					down = tops [i];
 				}
 			}
-			g = Geometry.pointofIntersection (new Block (new Dot (min.x + 1, min.y), min), new Block (down, up));
-			rightUp = down;
+
+			if (up == down) {
+				g = up;
+			} else {
+				g = Geometry.pointofIntersection (new Block (new Dot (min.x + 1, min.y), min), new Block (down, up));
+			}
+			leftUp = down;
 			drawer.DrawImportantObject (g.x, g.y);
 		}
-
-		List<Dot> circuit = new List<Dot> ();
+			
 		circuit.Add (g);
-		if (!minIsOnePoint)
-			circuit.Add (y);
+		if (!minIsOnePoint) {
+			circuit.Add (z);
+		}
 
 		if (!minInPolygon) {
 			int index = topsAsDots.FindIndex (x=> x.x ==rightUp.x && x.y == rightUp.y);
 			int index2 = topsAsDots.FindIndex (x=> x.x ==rightDown.x && x.y == rightDown.y);
+			Debug.Log (rightUp);
 			circuit.Add (rightUp);
 			for (int i = index; i < index2; i++) {
+				if (i + 1 < index2) {
+					drawer.DrawLine (tops [i], tops [i + 1], Color.red, 2f);
+				}
 				circuit.Add (tops [i]);
 			}
+
 			circuit.Add (rightDown);
 		} else {
 			int index = topsAsDots.FindIndex (x=> x.x ==g.x && x.y == g.y);
@@ -278,7 +289,7 @@ public class Polygon {
 				circuit.Add (tops [i]);
 			}
 		}
-
+		drawer.debug = circuit;
 		drawer.SetCircuitText (calculateCircuit (circuit));
 	}
 
