@@ -20,7 +20,6 @@ public class firstV_Polygon : PolygonDrawer {
 
 		if (hasKernel) {
 			pol.calculateCircuit ();
-			pol.calculateArea ();
 		}
 	}
 

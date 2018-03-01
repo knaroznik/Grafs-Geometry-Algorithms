@@ -7,6 +7,7 @@ public class Polygon {
 	#region Starting : 
 
 	public List<UnityDot> tops;
+	private List<Dot> topsAsDots;
 	protected PolygonDrawer drawer;
 
 	protected Dot max;
@@ -29,6 +30,7 @@ public class Polygon {
 	public Polygon(PolygonDrawer drawer, List<Dot> dots){
 		this.drawer = drawer;
 		tops = new List<UnityDot> ();
+		topsAsDots = dots;
 		for (int i = 0; i < dots.Count; i++) {
 			tops.Add (new UnityDot (dots [i].x, dots [i].y, drawer.DrawTop (dots [i].x, dots [i].y)));
 			if(i==dots.Count-1){
@@ -137,7 +139,7 @@ public class Polygon {
 
 	public void calculateCircuit(){
 		if (minInPolygon && maxInPolygon) {
-			drawer.SetCircuitText (circuit(tops));
+			drawer.SetCircuitText (calculateCircuit(tops));
 			return;
 		}
 
@@ -151,7 +153,6 @@ public class Polygon {
 		if (maxInPolygon) {
 			findMaxPointsOnPolygon ();
 			calculatePoints ();
-			drawer.SetCircuitText (200);
 			return;
 		}
 
@@ -160,34 +161,44 @@ public class Polygon {
 	}
 		
 	protected void calculatePoints(){
+
+		Dot leftUp = new Dot(0,0);
+		Dot leftDown = new Dot(0,0);
+		Dot rightUp = new Dot (0, 0);
+		Dot rightDown = new Dot (0, 0);
+
 		if (y == null && !maxIsOnePoint) {
 			Dot up = new Dot(999,999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x > max.x) {
+				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x >= max.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x > max.x) {
+				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x >= max.x) {
 					down = tops [i];
 				}
 			}
-			// y = przecięcie prostej(up+down, min+min+10)
+			x = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (max.x + 1, max.y)));
+			rightDown = up;
+			drawer.DrawImportantObject (y.x, y.y);
 		}
 
 		if (x == null) {
 			Dot up = new Dot(999,999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x < max.x) {
+				if (tops [i].y > max.y && Geometry.distance(tops[i], max) < Geometry.distance(up, max) && tops[i].x <= max.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x < max.x) {
+				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x <= max.x) {
 					down = tops [i];
 				}
 			}
-			// x = przecięcie prostej(up+down, min+min+10)
+			x = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (max.x + 1, max.y)));
+			leftDown = up;
+			drawer.DrawImportantObject (x.x, x.y);
 		}
 
 		if (z == null && !minIsOnePoint) {
@@ -203,6 +214,7 @@ public class Polygon {
 				}
 			}
 			z = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (min.x + 1, min.y)));
+			rightUp = down;
 			drawer.DrawImportantObject (z.x, z.y);
 		}
 
@@ -210,19 +222,64 @@ public class Polygon {
 			Dot up = new Dot(-999,-999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > min.y && Geometry.distance(tops[i], min) < Geometry.distance(up, min) && tops[i].x < min.x) {
+				if (tops [i].y > min.y && Geometry.distance(tops[i], min) < Geometry.distance(up, min) && tops[i].x <= min.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < min.y && Geometry.distance(tops[i], min) < Geometry.distance(down, min) && tops[i].x < min.x) {
+				if (tops [i].y < min.y && Geometry.distance(tops[i], min) < Geometry.distance(down, min) && tops[i].x <= min.x) {
 					down = tops [i];
 				}
 			}
 			g = Geometry.pointofIntersection (new Block (new Dot (min.x + 1, min.y), min), new Block (down, up));
+			rightUp = down;
 			drawer.DrawImportantObject (g.x, g.y);
 		}
 
-		//TODO : Połączyć wszystko ze sobą i przekazać do funkcji circuit
+		List<Dot> circuit = new List<Dot> ();
+		circuit.Add (g);
+		if (!minIsOnePoint)
+			circuit.Add (y);
+
+		if (!minInPolygon) {
+			int index = topsAsDots.FindIndex (x=> x.x ==rightUp.x && x.y == rightUp.y);
+			int index2 = topsAsDots.FindIndex (x=> x.x ==rightDown.x && x.y == rightDown.y);
+			circuit.Add (rightUp);
+			for (int i = index; i < index2; i++) {
+				circuit.Add (tops [i]);
+			}
+			circuit.Add (rightDown);
+		} else {
+			int index = topsAsDots.FindIndex (x=> x.x ==g.x && x.y == g.y);
+			int index2 = topsAsDots.FindIndex (x=> x.x ==z.x && x.y == z.y);
+			for (int i = index; i < index2; i++) {
+				circuit.Add (tops [i]);
+			}
+		}
+	
+		if (!minIsOnePoint)
+			circuit.Add (y);
+
+		circuit.Add (x);
+
+		if (!maxInPolygon) {
+			int index = topsAsDots.FindIndex (x=> x.x ==leftDown.x && x.y == leftDown.y);
+			int index2 = topsAsDots.FindIndex (x=> x.x ==leftUp.x && x.y == leftUp.y);
+
+			circuit.Add (leftDown);
+			for (int i = index; i < index2; i++) {
+				circuit.Add (tops [i]);
+			}
+			circuit.Add (leftUp);
+		} else {
+			int index = topsAsDots.FindIndex(x=> x.x ==y.x && x.y == y.y);
+			int index2 = topsAsDots.FindIndex (q=> q.x ==x.x && q.y == x.y);
+
+			for (int i = index; i < index2; i++) {
+				circuit.Add (tops [i]);
+			}
+		}
+
+		drawer.SetCircuitText (calculateCircuit (circuit));
 	}
 
 	protected void findMinPointsOnPolygon(){
@@ -308,7 +365,7 @@ public class Polygon {
 		drawer.DrawImportantObject (y.x, y.y);
 	}
 
-	protected float circuit(List<Dot> points){
+	protected float calculateCircuit(List<Dot> points){
 		float output = 0;
 		for (int i = 0; i < points.Count; i++) {
 			output += Geometry.distance (points[(i % points.Count + points.Count)%points.Count], points[(i+1 % points.Count + points.Count)%points.Count]);
@@ -316,20 +373,12 @@ public class Polygon {
 		return output;
 	}
 
-	protected float circuit(List<UnityDot> points){
+	protected float calculateCircuit(List<UnityDot> points){
 		float output = 0;
 		for (int i = 0; i < points.Count; i++) {
 			output += Geometry.distance (points[(i % points.Count + points.Count)%points.Count], points[(i+1 % points.Count + points.Count)%points.Count]);
 		}
 		return output;
-	}
-
-	#endregion
-
-	#region Area : 
-
-	public void calculateArea(){
-
 	}
 
 	#endregion

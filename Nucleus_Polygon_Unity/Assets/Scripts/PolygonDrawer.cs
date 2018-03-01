@@ -26,7 +26,6 @@ public class PolygonDrawer : MonoBehaviour {
 
 		if (hasKernel) {
 			pol.calculateCircuit ();
-			pol.calculateArea ();
 		} else {
 			SetAreaText (-1);
 			SetCircuitText (-1);
