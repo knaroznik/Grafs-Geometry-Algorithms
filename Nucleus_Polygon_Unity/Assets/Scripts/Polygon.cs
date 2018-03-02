@@ -8,8 +8,7 @@ public class Polygon {
 	protected PolygonDrawer drawer;
 
 	public List<UnityDot> tops;
-	private List<Dot> topsAsDots;
-
+	protected List<Dot> topsAsDots;
 
 	protected Dot MAX;
 	protected Dot MIN;
@@ -61,8 +60,7 @@ public class Polygon {
 	}
 
 	public bool HaveKernel(){
-		calculateMax ();
-		calculateMin ();
+		calculateImportantPoints ();
 
 		if (MAX.y > MIN.y) {
 			return false;
@@ -75,17 +73,9 @@ public class Polygon {
 			importantsList.Add (checkingDot);
 			if (importantThing == null)
 				importantThing = checkingDot;
-			//FIXME : Może da radę ładniej? 
-			if (importantThing == MAX) {
-				if (checkingDot.y > importantThing.y) {
-					importantThing = checkingDot;
-				}
-			} else {
-				if (checkingDot.y < importantThing.y) {
-					importantThing = checkingDot;
-				}
+			if (Mathf.Sign(checkingDot.y - importantThing.y) == Mathf.Sign(heightDifference)) {
+				importantThing = checkingDot;
 			}
-
 		}
 	}
 
@@ -98,41 +88,14 @@ public class Polygon {
 		}
 	}
 		
-	protected void calculateMax(){
+	protected void calculateImportantPoints(){
 		for (int i = 0; i < tops.Count; i++) {
 			Dot center = tops [i];
 			Dot prev = getDot (i - 1);
 			Dot next = getDot (i + 1);
 
-			if (prev.y < center.y && next.y < center.y) {
-				addImportant (center, 0.1f, maxs, ref MAX);
-			} 
-			else if (prev.y < center.y && next.y == center.y) {
-				List<Dot> local  = new List<Dot> ();
-				local.Add (center);
-				local.Add (next);
-				int localIndex = i + 2;
-				while (getDot (localIndex).y == next.y) {
-					local.Add (getDot (localIndex));
-					localIndex++;
-				}
-				if (getDot (localIndex).y < next.y) {
-					addImportants (center, 0.1f, local, maxs, ref MAX);
-				}
-			}
-			else if (prev.y == center.y && next.y > center.y) {
-				List<Dot> local  = new List<Dot> ();
-				local.Add (center);
-				local.Add (prev);
-				int localIndex = i - 2;
-				while (getDot (localIndex).y == prev.y) {
-					local.Add (getDot (localIndex));
-					localIndex--;
-				}
-				if (getDot (localIndex).y < prev.y) {
-					addImportants (center, 0.1f, local, maxs, ref MAX);
-				}
-			}
+			checkForMax (prev, center, next, i);
+			checkForMin (prev, center, next, i);
 		}
 
 		if (MAX == null) {
@@ -144,46 +107,7 @@ public class Polygon {
 			}
 			maxInPolygon = true;
 		}
-		drawer.DrawImportantObject (MAX.x, MAX.y);
-	}
-		
-	protected void calculateMin(){
-		//Wyliczenie minimum : 
-		for (int i = 0; i < tops.Count; i++) {
-			Dot center = tops [i];
-			Dot prev = getDot (i - 1);
-			Dot next = getDot (i + 1);
 
-			if (prev.y > center.y && next.y > center.y) {
-				addImportant (center, -0.1f, mins, ref MIN);
-			} else if (prev.y > center.y && next.y == center.y) {
-				List<Dot> local  = new List<Dot> ();
-				local.Add (center);
-				local.Add (next);
-				int localIndex = i + 2;
-				while (getDot (localIndex).y == next.y) {
-					local.Add (getDot (localIndex));
-					localIndex++;
-				}
-				if (getDot (localIndex).y > next.y) {
-					addImportants (center, -0.1f, local, mins, ref MIN);
-				}
-			}else if (prev.y == center.y && next.y > center.y) {
-				List<Dot> local  = new List<Dot> ();
-				local.Add (center);
-				local.Add (prev);
-				int localIndex = i - 2;
-				while (getDot (localIndex).y == prev.y) {
-					local.Add (getDot (localIndex));
-					localIndex--;
-				}
-				if (getDot (localIndex).y > prev.y) {
-					addImportants (center, -0.1f, local, mins, ref MIN);
-				}
-			}
-		}
-
-		//Nie ma minimum - bierzemy najwyżjszy punkt : 
 		if (MIN == null) {
 			minInPolygon = true;
 			MIN = tops [0];
@@ -193,8 +117,71 @@ public class Polygon {
 				}
 			}
 		}
-		//Wyświetlenie minimum : 
+
+		drawer.DrawImportantObject (MAX.x, MAX.y);
 		drawer.DrawImportantObject (MIN.x, MIN.y);
+	}
+
+	protected void checkForMax(Dot prev, Dot center, Dot next, int i){
+		if (prev.y < center.y && next.y < center.y) {
+			addImportant (center, 0.1f, maxs, ref MAX);
+		} 
+		else if (prev.y < center.y && next.y == center.y) {
+			List<Dot> local  = new List<Dot> ();
+			local.Add (center);
+			local.Add (next);
+			int localIndex = i + 2;
+			while (getDot (localIndex).y == next.y) {
+				local.Add (getDot (localIndex));
+				localIndex++;
+			}
+			if (getDot (localIndex).y < next.y) {
+				addImportants (center, 0.1f, local, maxs, ref MAX);
+			}
+		}
+		else if (prev.y == center.y && next.y > center.y) {
+			List<Dot> local  = new List<Dot> ();
+			local.Add (center);
+			local.Add (prev);
+			int localIndex = i - 2;
+			while (getDot (localIndex).y == prev.y) {
+				local.Add (getDot (localIndex));
+				localIndex--;
+			}
+			if (getDot (localIndex).y < prev.y) {
+				addImportants (center, 0.1f, local, maxs, ref MAX);
+			}
+		}
+	}
+		
+	protected void checkForMin(Dot prev, Dot center, Dot next, int i){
+		if (prev.y > center.y && next.y > center.y) {
+			addImportant (center, -0.1f, mins, ref MIN);
+		} else if (prev.y > center.y && next.y == center.y) {
+			List<Dot> local  = new List<Dot> ();
+			local.Add (center);
+			local.Add (next);
+			int localIndex = i + 2;
+			while (getDot (localIndex).y == next.y) {
+				local.Add (getDot (localIndex));
+				localIndex++;
+			}
+			if (getDot (localIndex).y > next.y) {
+				addImportants (center, -0.1f, local, mins, ref MIN);
+			}
+		}else if (prev.y == center.y && next.y > center.y) {
+			List<Dot> local  = new List<Dot> ();
+			local.Add (center);
+			local.Add (prev);
+			int localIndex = i - 2;
+			while (getDot (localIndex).y == prev.y) {
+				local.Add (getDot (localIndex));
+				localIndex--;
+			}
+			if (getDot (localIndex).y > prev.y) {
+				addImportants (center, -0.1f, local, mins, ref MIN);
+			}
+		}
 	}
 
 	#endregion
