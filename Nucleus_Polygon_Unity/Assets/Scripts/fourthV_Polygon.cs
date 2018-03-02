@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class secondV_Polygon : PolygonDrawer {
+public class fourthV_Polygon : PolygonDrawer {
 
 	private List<Dot> calculatedTops;
 
@@ -41,7 +41,7 @@ public class secondV_Polygon : PolygonDrawer {
 			_x += 5;
 			calculatedTops.Add (new Dot (_x, y+ differerenceX));
 		}
-			
+
 		calculatedTops.Add (new Dot (-firstX, firstY));
 
 		float prev_x = -firstX;
@@ -54,6 +54,18 @@ public class secondV_Polygon : PolygonDrawer {
 			calculatedTops.Add (new Dot (prev_x+differerence, next_y));
 			next_y -= 4f;
 			calculatedTops.Add (new Dot (prev_x-differerence, next_y));
+		}
+
+		_x = prev_x - 7f;
+		calculatedTops.Add (new Dot (_x, next_y));
+
+		for (int i = 0; i < 4; i++) {
+			float differerenceX = Random.Range (1f, 40f);
+			_x -= 5;
+			float y = next_y + differerenceX;
+			calculatedTops.Add (new Dot (_x, y));
+			_x -= 5;
+			calculatedTops.Add (new Dot (_x, y- differerenceX));
 		}
 
 		calculatedTops.Add (new Dot (firstX, next_y));

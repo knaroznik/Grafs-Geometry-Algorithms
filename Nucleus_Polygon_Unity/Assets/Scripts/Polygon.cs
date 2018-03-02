@@ -5,20 +5,16 @@ using UnityEngine;
 public class Polygon {
 
 	#region Starting : 
+	protected PolygonDrawer drawer;
 
 	public List<UnityDot> tops;
 	private List<Dot> topsAsDots;
-	protected PolygonDrawer drawer;
 
-	protected Dot max;
-	protected Dot min;
 
-	public List<Dot> circuit = new List<Dot> ();
-
-	protected Dot x;
-	protected Dot y;
-	protected Dot g;
-	protected Dot z;
+	protected Dot MAX;
+	protected Dot MIN;
+	protected List<Dot> mins = new List<Dot> ();
+	protected List<Dot> maxs = new List<Dot> ();
 
 	protected bool maxInPolygon;
 	protected bool minInPolygon;
@@ -68,12 +64,33 @@ public class Polygon {
 		calculateMax ();
 		calculateMin ();
 
-		if (max.y > min.y) {
+		if (MAX.y > MIN.y) {
 			return false;
 		}
 		return true;
 	}
 
+	protected void addMax(Dot checkingDot, float heightDifference){
+		if (isInside (new Dot (checkingDot.x, checkingDot.y + heightDifference))) {
+			maxs.Add (checkingDot);
+			if (MAX == null)
+				MAX = checkingDot;
+			if (checkingDot.y > MAX.y) {
+				MAX = checkingDot;
+			}
+		}
+	}
+
+	protected void addMaxs(Dot checkingDot, float heightDifference, List<Dot> toAdd){
+		if (isInside (new Dot (checkingDot.x, checkingDot.y + heightDifference))) {
+			for (int i = 0; i < toAdd.Count; i++) {
+				maxs.Add (toAdd [i]);
+			}
+			addMax (checkingDot, heightDifference);
+		}
+	}
+
+	//CHECKED : 
 	protected void calculateMax(){
 		maxInPolygon = false;
 		for (int i = 0; i < tops.Count; i++) {
@@ -82,62 +99,136 @@ public class Polygon {
 			Dot next = getDot (i + 1);
 
 			if (prev.y < center.y && next.y < center.y) {
-				if(isInside(new Dot(center.x, center.y + 0.1f))){
-					if (max == null)
-						max = center;
-					if (center.y > max.y) {
-						max = center;
-					}
+				addMax (center, 0.1f);
+			} 
+			else if (prev.y < center.y && next.y == center.y) {
+				List<Dot> local  = new List<Dot> ();
+				local.Add (center);
+				local.Add (next);
+				int localIndex = i + 2;
+				while (getDot (localIndex).y == next.y) {
+					local.Add (getDot (localIndex));
+					localIndex++;
+				}
+				if (getDot (localIndex).y < next.y) {
+					addMaxs (center, 0.1f, local);
+				}
+			}
+			else if (prev.y == center.y && next.y > center.y) {
+				List<Dot> local  = new List<Dot> ();
+				local.Add (center);
+				local.Add (prev);
+				int localIndex = i - 2;
+				while (getDot (localIndex).y == prev.y) {
+					local.Add (getDot (localIndex));
+					localIndex--;
+				}
+				if (getDot (localIndex).y < prev.y) {
+					addMaxs (center, 0.1f, local);
 				}
 			}
 		}
 
-		if (max == null) {
-			max = tops [0];
+		if (MAX == null) {
+			MAX = tops [0];
 			for (int i = 1; i < tops.Count; i++) {
-				if (tops [i].y < max.y) {
-					max = tops [i];
+				if (tops [i].y < MAX.y) {
+					MAX = tops [i];
 				}
 			}
 			maxInPolygon = true;
 		}
-		drawer.DrawImportantObject (max.x, max.y);
+		drawer.DrawImportantObject (MAX.x, MAX.y);
 	}
 
+	//CHECKED :
 	protected void calculateMin(){
 		minInPolygon = false;
+		//Wyliczenie minimum : 
 		for (int i = 0; i < tops.Count; i++) {
 			Dot center = tops [i];
 			Dot prev = getDot (i - 1);
 			Dot next = getDot (i + 1);
 
 			if (prev.y > center.y && next.y > center.y) {
-				if(isInside(new Dot(center.x, center.y - 0.1f))){
-					if (min == null)
-						min = center;
-					if (center.y < min.y) {
-						min = center;
+				if (isInside (new Dot (center.x, center.y - 0.1f))) {
+					mins.Add (center);
+					if (MIN == null)
+						MIN = center;
+					if (center.y < MIN.y) {
+						MIN = center;
+					}
+				}
+			} else if (prev.y > center.y && next.y == center.y) {
+				List<Dot> local  = new List<Dot> ();
+				local.Add (center);
+				local.Add (next);
+				int localIndex = i + 2;
+				while (getDot (localIndex).y == next.y) {
+					local.Add (getDot (localIndex));
+					localIndex++;
+				}
+				if (getDot (localIndex).y > next.y) {
+					if (isInside (new Dot (getDot (localIndex).x, getDot (localIndex).y - 0.1f))) {
+						for (int j = 0; j < local.Count; j++) {
+							mins.Add (local [j]);
+						}
+						if (MIN == null)
+							MIN = center;
+						if (center.y < MIN.y) {
+							MIN = center;
+						}
+					}
+				}
+			}else if (prev.y == center.y && next.y > center.y) {
+				List<Dot> local  = new List<Dot> ();
+				local.Add (center);
+				local.Add (prev);
+				int localIndex = i - 2;
+				while (getDot (localIndex).y == prev.y) {
+					local.Add (getDot (localIndex));
+					localIndex--;
+				}
+				if (getDot (localIndex).y > prev.y) {
+					if (isInside (new Dot (getDot (localIndex).x, getDot (localIndex).y - 0.1f))) {
+						for (int j = 0; j < local.Count; j++) {
+							mins.Add (local [j]);
+						}
+						if (MIN == null)
+							MIN = center;
+						if (center.y < MIN.y) {
+							MIN = center;
+						}
 					}
 				}
 			}
 		}
 
-		if (min == null) {
+		//Nie ma minimum - bierzemy najwyżjszy punkt : 
+		if (MIN == null) {
 			minInPolygon = true;
-			min = tops [0];
+			MIN = tops [0];
 			for (int i = 1; i < tops.Count; i++) {
-				if (tops [i].y > min.y) {
-					min = tops [i];
+				if (tops [i].y > MIN.y) {
+					MIN = tops [i];
 				}
 			}
 		}
-
-		drawer.DrawImportantObject (min.x, min.y);
+		//Wyświetlenie minimum : 
+		drawer.DrawImportantObject (MIN.x, MIN.y);
 	}
 
 	#endregion
 
 	#region Circuit : 
+
+
+	protected Dot x;
+	protected Dot y;
+	protected Dot g;
+	protected Dot z;
+
+	public List<Dot> circuit = new List<Dot> ();
 
 	public void calculateCircuit(){
 		if (minInPolygon && maxInPolygon) {
@@ -147,17 +238,17 @@ public class Polygon {
 
 		if (minInPolygon) {
 			findMinPointsOnPolygon ();
-			calculatePoints ();
+			//calculatePoints ();
 			return;
 		}
 
 		if (maxInPolygon) {
 			findMaxPointsOnPolygon ();
-			calculatePoints ();
+			//calculatePoints ();
 			return;
 		}
 
-		calculatePoints ();
+		//calculatePoints ();
 		drawer.SetCircuitText (1);
 	}
 		
@@ -172,15 +263,15 @@ public class Polygon {
 			Dot up = new Dot(999,999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > max.y && (Mathf.Abs(tops[i].y-max.y)) < (Mathf.Abs(up.y-max.y)) && tops[i].x >= max.x) {
+				if (tops [i].y > MAX.y && (Mathf.Abs(tops[i].y-MAX.y)) < (Mathf.Abs(up.y-MAX.y)) && tops[i].x >= MAX.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < max.y && Geometry.distance(tops[i], max) < Geometry.distance(down, max) && tops[i].x >= max.x) {
+				if (tops [i].y < MAX.y && Geometry.distance(tops[i], MAX) < Geometry.distance(down, MAX) && tops[i].x >= MAX.x) {
 					down = tops [i];
 				}
 			}
-			x = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (max.x + 1, max.y)));
+			x = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MAX.x + 1, MAX.y)));
 			rightDown = up;
 			drawer.DrawImportantObject (y.x, y.y);
 		}
@@ -189,15 +280,15 @@ public class Polygon {
 			Dot up = new Dot(999,999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > max.y && (Mathf.Abs(tops[i].y-max.y)) < (Mathf.Abs(up.y-max.y)) && tops[i].x <= max.x) {
+				if (tops [i].y > MAX.y && (Mathf.Abs(tops[i].y-MAX.y)) < (Mathf.Abs(up.y-MAX.y)) && tops[i].x <= MAX.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < max.y && (Mathf.Abs(tops[i].y-max.y)) < (Mathf.Abs(up.y-max.y)) && tops[i].x <= max.x) {
+				if (tops [i].y < MAX.y && (Mathf.Abs(tops[i].y-MAX.y)) < (Mathf.Abs(up.y-MAX.y)) && tops[i].x <= MAX.x) {
 					down = tops [i];
 				}
 			}
-			x = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (max.x + 1, max.y)));
+			x = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MAX.x + 1, MAX.y)));
 			leftDown = up;
 			drawer.DrawImportantObject (x.x, x.y);
 		}
@@ -206,15 +297,15 @@ public class Polygon {
 			Dot up = new Dot(-999,-999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > min.y && (Mathf.Abs(tops[i].y-min.y)) < (Mathf.Abs(up.y-min.y)) && tops[i].x > min.x) {
+				if (tops [i].y > MIN.y && (Mathf.Abs(tops[i].y-MIN.y)) < (Mathf.Abs(up.y-MIN.y)) && tops[i].x > MIN.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < min.y && (Mathf.Abs(Mathf.Abs(tops[i].y)-Mathf.Abs(min.y))) < (Mathf.Abs((Mathf.Abs(up.y)-Mathf.Abs(min.y)))) && tops[i].x > min.x) {
+				if (tops [i].y < MIN.y && (Mathf.Abs(Mathf.Abs(tops[i].y)-Mathf.Abs(MIN.y))) < (Mathf.Abs((Mathf.Abs(up.y)-Mathf.Abs(MIN.y)))) && tops[i].x > MIN.x) {
 					down = tops [i];
 				}
 			}
-			z = Geometry.pointofIntersection (new Block (up, down), new Block (min, new Dot (min.x + 1, min.y)));
+			z = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MIN.x + 1, MIN.y)));
 			rightUp = down;
 			drawer.DrawImportantObject (z.x, z.y);
 		}
@@ -223,11 +314,11 @@ public class Polygon {
 			Dot up = new Dot(-999,-999);
 			Dot down = new Dot(999,999);
 			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > min.y && (Mathf.Abs(tops[i].y-min.y)) < (Mathf.Abs(up.y-min.y)) && tops[i].x <= min.x) {
+				if (tops [i].y > MIN.y && (Mathf.Abs(tops[i].y-MIN.y)) < (Mathf.Abs(up.y-MIN.y)) && tops[i].x <= MIN.x) {
 					up = tops [i];
 				}
 
-				if (tops [i].y < min.y && (Mathf.Abs(tops[i].y-min.y)) < (Mathf.Abs(up.y-min.y)) && tops[i].x <= min.x) {
+				if (tops [i].y < MIN.y && (Mathf.Abs(tops[i].y-MIN.y)) < (Mathf.Abs(up.y-MIN.y)) && tops[i].x <= MIN.x) {
 					down = tops [i];
 				}
 			}
@@ -235,7 +326,7 @@ public class Polygon {
 			if (up == down) {
 				g = up;
 			} else {
-				g = Geometry.pointofIntersection (new Block (new Dot (min.x + 1, min.y), min), new Block (down, up));
+				g = Geometry.pointofIntersection (new Block (new Dot (MIN.x + 1, MIN.y), MIN), new Block (down, up));
 			}
 			leftUp = down;
 			drawer.DrawImportantObject (g.x, g.y);
@@ -297,7 +388,7 @@ public class Polygon {
 		List<Dot> search = new List<Dot> ();
 
 		for (int i = 0; i < tops.Count; i++) {
-			if (tops [i].y == min.y) {
+			if (tops [i].y == MIN.y) {
 				search.Add (tops [i]);
 			}
 		}
@@ -339,7 +430,7 @@ public class Polygon {
 		List<Dot> search = new List<Dot> ();
 
 		for (int i = 0; i < tops.Count; i++) {
-			if (tops [i].y == max.y) {
+			if (tops [i].y == MAX.y) {
 				search.Add (tops [i]);
 			}
 		}
