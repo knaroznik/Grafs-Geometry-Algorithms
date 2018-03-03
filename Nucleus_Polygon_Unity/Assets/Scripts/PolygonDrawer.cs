@@ -30,6 +30,7 @@ public class PolygonDrawer : MonoBehaviour {
 			pol.calculateCircuit ();
 		} else {
 			SetCircuitText (-1);
+			SetTopsText (-1);
 		}
 	}
 
@@ -81,5 +82,9 @@ public class PolygonDrawer : MonoBehaviour {
 
 	public void SetCircuitText(float circuit){
 		sceneBehaviour.circuit.GetComponent<Text> ().text = "Circuit : " + circuit;
+	}
+
+	public void SetTopsText(int tops){
+		sceneBehaviour.topsCount.GetComponent<Text> ().text = "Tops in circuit : " + tops;
 	}
 }

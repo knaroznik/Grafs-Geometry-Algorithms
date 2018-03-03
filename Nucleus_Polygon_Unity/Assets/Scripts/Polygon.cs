@@ -30,6 +30,12 @@ public class Polygon {
 		topsAsDots = dots;
 		for (int i = 0; i < dots.Count; i++) {
 			tops.Add (new UnityDot (dots [i].x, dots [i].y, drawer.DrawTop (dots [i].x, dots [i].y)));
+		}
+		drawLines (dots);
+	}
+
+	protected void drawLines(List<Dot> dots){
+		for (int i = 0; i < dots.Count; i++) {
 			if(i==dots.Count-1){
 				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [0].x, dots [0].y, 0f), Color.white, 1f);
 			}
@@ -189,170 +195,104 @@ public class Polygon {
 	#region Circuit : 
 
 
-	protected Dot x;
-	protected Dot y;
-	protected Dot g;
-	protected Dot z;
-
-	public List<Dot> circuit = new List<Dot> ();
+	protected Dot leftDownCorner, rightDownCorner, rightUpCorner, leftUpCorner;
+	protected List<Dot> circuit = new List<Dot> ();
 
 	public void calculateCircuit(){
 		if (minInPolygon && maxInPolygon) {
-			drawer.SetCircuitText (calculateCircuit(tops));
+			drawer.SetCircuitText (calculateCircuit (tops));
+			drawer.SetTopsText (tops.Count);
 			return;
-		}
-
-		if (minInPolygon) {
+		} else if (minInPolygon) {
 			findMinPointsOnPolygon ();
-			//calculatePoints ();
+			thirdVersion_minInPolygon_maxToCalculate ();
 			return;
-		}
-
-		if (maxInPolygon) {
+		} else if (maxInPolygon) {
 			findMaxPointsOnPolygon ();
-			//calculatePoints ();
+			secondVersion_maxInPolygon_minToCalculate ();
 			return;
+		} else {
+			fourthVersion_minAndMaxToCalculate ();
 		}
-
-		//calculatePoints ();
-		drawer.SetCircuitText (1);
 	}
-		
-	protected void calculatePoints(){
 
-		Dot leftUp = new Dot(0,0);
-		Dot leftDown = new Dot(0,0);
-		Dot rightUp = new Dot (0, 0);
-		Dot rightDown = new Dot (0, 0);
+	protected void secondVersion_maxInPolygon_minToCalculate(){
 
-		if (y == null && !maxIsOnePoint) {
-			Dot up = new Dot(999,999);
-			Dot down = new Dot(999,999);
-			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > MAX.y && (Mathf.Abs(tops[i].y-MAX.y)) < (Mathf.Abs(up.y-MAX.y)) && tops[i].x >= MAX.x) {
-					up = tops [i];
-				}
-
-				if (tops [i].y < MAX.y && Geometry.distance(tops[i], MAX) < Geometry.distance(down, MAX) && tops[i].x >= MAX.x) {
-					down = tops [i];
-				}
-			}
-			x = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MAX.x + 1, MAX.y)));
-			rightDown = up;
-			drawer.DrawImportantObject (y.x, y.y);
-		}
-
-		if (x == null) {
-			Dot up = new Dot(999,999);
-			Dot down = new Dot(999,999);
-			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > MAX.y && (Mathf.Abs(tops[i].y-MAX.y)) < (Mathf.Abs(up.y-MAX.y)) && tops[i].x <= MAX.x) {
-					up = tops [i];
-				}
-
-				if (tops [i].y < MAX.y && (Mathf.Abs(tops[i].y-MAX.y)) < (Mathf.Abs(up.y-MAX.y)) && tops[i].x <= MAX.x) {
-					down = tops [i];
-				}
-			}
-			x = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MAX.x + 1, MAX.y)));
-			leftDown = up;
-			drawer.DrawImportantObject (x.x, x.y);
-		}
-
-		if (z == null && !minIsOnePoint){
-			Dot up = new Dot(-999,-999);
-			Dot down = new Dot(999,999);
-			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > MIN.y && (Mathf.Abs(tops[i].y-MIN.y)) < (Mathf.Abs(up.y-MIN.y)) && tops[i].x > MIN.x) {
-					up = tops [i];
-				}
-
-				if (tops [i].y < MIN.y && (Mathf.Abs(Mathf.Abs(tops[i].y)-Mathf.Abs(MIN.y))) < (Mathf.Abs((Mathf.Abs(up.y)-Mathf.Abs(MIN.y)))) && tops[i].x > MIN.x) {
-					down = tops [i];
-				}
-			}
-			z = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MIN.x + 1, MIN.y)));
-			rightUp = down;
-			drawer.DrawImportantObject (z.x, z.y);
-		}
-
-		if (g == null) {
-			Dot up = new Dot(-999,-999);
-			Dot down = new Dot(999,999);
-			for (int i = 0; i < tops.Count; i++) {
-				if (tops [i].y > MIN.y && (Mathf.Abs(tops[i].y-MIN.y)) < (Mathf.Abs(up.y-MIN.y)) && tops[i].x <= MIN.x) {
-					up = tops [i];
-				}
-
-				if (tops [i].y < MIN.y && (Mathf.Abs(tops[i].y-MIN.y)) < (Mathf.Abs(up.y-MIN.y)) && tops[i].x <= MIN.x) {
-					down = tops [i];
-				}
-			}
-
-			if (up == down) {
-				g = up;
-			} else {
-				g = Geometry.pointofIntersection (new Block (new Dot (MIN.x + 1, MIN.y), MIN), new Block (down, up));
-			}
-			leftUp = down;
-			drawer.DrawImportantObject (g.x, g.y);
-		}
-			
-		circuit.Add (g);
-		if (!minIsOnePoint) {
-			circuit.Add (z);
-		}
-
-		if (!minInPolygon) {
-			int index = topsAsDots.FindIndex (x=> x.x ==rightUp.x && x.y == rightUp.y);
-			int index2 = topsAsDots.FindIndex (x=> x.x ==rightDown.x && x.y == rightDown.y);
-			Debug.Log (rightUp);
-			circuit.Add (rightUp);
-			for (int i = index; i < index2; i++) {
-				if (i + 1 < index2) {
-					drawer.DrawLine (tops [i], tops [i + 1], Color.red, 2f);
-				}
-				circuit.Add (tops [i]);
-			}
-
-			circuit.Add (rightDown);
-		} else {
-			int index = topsAsDots.FindIndex (x=> x.x ==g.x && x.y == g.y);
-			int index2 = topsAsDots.FindIndex (x=> x.x ==z.x && x.y == z.y);
-			for (int i = index; i < index2; i++) {
-				circuit.Add (tops [i]);
-			}
-		}
-	
-		if (!minIsOnePoint)
-			circuit.Add (y);
-
-		circuit.Add (x);
-
-		if (!maxInPolygon) {
-			int index = topsAsDots.FindIndex (x=> x.x ==leftDown.x && x.y == leftDown.y);
-			int index2 = topsAsDots.FindIndex (x=> x.x ==leftUp.x && x.y == leftUp.y);
-
-			circuit.Add (leftDown);
-			for (int i = index; i < index2; i++) {
-				circuit.Add (tops [i]);
-			}
-			circuit.Add (leftUp);
-		} else {
-			int index = topsAsDots.FindIndex(x=> x.x ==y.x && x.y == y.y);
-			int index2 = topsAsDots.FindIndex (q=> q.x ==x.x && q.y == x.y);
-
-			for (int i = index; i < index2; i++) {
-				circuit.Add (tops [i]);
-			}
-		}
-		drawer.debug = circuit;
+		Dot firstKnownPointRight = findMINPointsRIGHT();
+		Dot firstKnownPointLeft = findMINPointsLEFT ();
+		List<Dot> circuit = new List<Dot> ();
+		circuit.Add (leftUpCorner);
+		circuit.Add (rightUpCorner);
+		addToList (circuit, 
+			tops.FindIndex (x => x.x == firstKnownPointRight.x && x.y == firstKnownPointRight.y), 
+			tops.FindIndex (x => x.x == rightDownCorner.x && x.y == rightDownCorner.y));
+		addToList(circuit, 
+			tops.FindIndex (x => x.x == leftDownCorner.x && x.y == leftDownCorner.y), 
+			tops.FindIndex (x => x.x == firstKnownPointLeft.x && x.y == firstKnownPointLeft.y));
+		drawLines (circuit);
+		drawer.SetTopsText(circuit.Count);
 		drawer.SetCircuitText (calculateCircuit (circuit));
 	}
 
+	protected void addToList(List<Dot> toAddList, int firstIndex, int lastIndex){
+		for(int i=firstIndex; i<lastIndex+1; i++){
+			toAddList.Add (tops [i]);
+		}
+	}
+
+	protected Dot findMINPointsRIGHT(){
+		Dot up = new Dot(999,999);
+		Dot down = new Dot(999,999);
+		for (int i = 0; i < tops.Count; i++) {
+			if (maxs.Contains (tops [i]) || mins.Contains (tops [i])) {
+				continue;
+			}
+
+			if (tops [i].y >= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(up.y, MIN.y) && tops[i].x > MIN.x) {
+				up = tops [i];
+			}
+
+			if (tops [i].y <= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(down.y, MIN.y) && tops[i].x > MIN.x) {
+				down = tops [i];
+			}
+		}
+		rightUpCorner = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MIN.x + 1, MIN.y)));
+		drawer.DrawImportantObject (rightUpCorner.x, rightUpCorner.y);
+		return down;
+	}
+
+	protected Dot findMINPointsLEFT(){
+		Dot up = new Dot(999,999);
+		Dot down = new Dot(999,999);
+		for (int i = 0; i < tops.Count; i++) {
+			if (maxs.Contains (tops [i]) || mins.Contains (tops [i])) {
+				continue;
+			}
+
+			if (tops [i].y >= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(up.y, MIN.y) && tops[i].x <= MIN.x) {
+				up = tops [i];
+			}
+
+			if (tops [i].y <= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(down.y, MIN.y) && tops[i].x <= MIN.x) {
+				down = tops [i];
+			}
+		}
+		leftUpCorner = Geometry.pointofIntersection (new Block (up, down), new Block (MIN, new Dot (MIN.x + 1, MIN.y)));
+		drawer.DrawImportantObject (leftUpCorner.x, leftUpCorner.y);
+		return down;
+	}
+
+	protected void thirdVersion_minInPolygon_maxToCalculate(){
+
+	}
+
+	protected void fourthVersion_minAndMaxToCalculate (){
+
+	}
+
+
 	protected void findMinPointsOnPolygon(){
 		List<Dot> search = new List<Dot> ();
-
 		for (int i = 0; i < tops.Count; i++) {
 			if (tops [i].y == MIN.y) {
 				search.Add (tops [i]);
@@ -360,7 +300,8 @@ public class Polygon {
 		}
 
 		if (search.Count == 1) {
-			g = search [0];
+			rightUpCorner = search [0];
+			drawer.DrawImportantObject (rightUpCorner.x, rightUpCorner.y);
 			minIsOnePoint = true;
 			return;
 		}
@@ -375,21 +316,21 @@ public class Polygon {
 				q = search [i];
 				w = search [j];
 				if (Geometry.distance (q, w) > prev_count) {
-					g = q;
-					z = w;
+					rightUpCorner = q;
+					leftUpCorner = w;
 					prev_count = Geometry.distance (q, w);
 				}
 			}
 		}
 
-		if (g.x > z.x) {
-			Dot temp = g;
-			g = z;
-			z = temp;
+		if (rightUpCorner.x > leftUpCorner.x) {
+			Dot temp = rightUpCorner;
+			rightUpCorner = leftUpCorner;
+			leftUpCorner = temp;
 		}
 
-		drawer.DrawImportantObject (g.x, g.y);
-		drawer.DrawImportantObject (z.x, z.y);
+		drawer.DrawImportantObject (rightUpCorner.x, rightUpCorner.y);
+		drawer.DrawImportantObject (leftUpCorner.x, leftUpCorner.y);
 	}
 
 	protected void findMaxPointsOnPolygon(){
@@ -403,7 +344,8 @@ public class Polygon {
 
 		if (search.Count == 1) {
 			maxIsOnePoint = true;
-			x = search [0];
+			leftDownCorner = search [0];
+			drawer.DrawImportantObject (leftDownCorner.x, leftDownCorner.y);
 			return;
 		}
 
@@ -416,21 +358,21 @@ public class Polygon {
 				q = search [i];
 				w = search [j];
 				if (Geometry.distance (q, w) > prev_count) {
-					x = q;
-					y = w;
+					leftDownCorner = q;
+					rightDownCorner = w;
 					prev_count = Geometry.distance (q, w);
 				}
 			}
 		}
 
-		if (x.x > y.x) {
-			Dot temp = x;
-			x = y;
-			y = temp;
+		if (leftDownCorner.x > rightDownCorner.x) {
+			Dot temp = leftDownCorner;
+			leftDownCorner = rightDownCorner;
+			rightDownCorner = temp;
 		}
 
-		drawer.DrawImportantObject (x.x, x.y);
-		drawer.DrawImportantObject (y.x, y.y);
+		drawer.DrawImportantObject (leftDownCorner.x, leftDownCorner.y);
+		drawer.DrawImportantObject (rightDownCorner.x, rightDownCorner.y);
 	}
 
 	protected float calculateCircuit(List<Dot> points){
