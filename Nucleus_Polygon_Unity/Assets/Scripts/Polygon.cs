@@ -31,16 +31,16 @@ public class Polygon {
 		for (int i = 0; i < dots.Count; i++) {
 			tops.Add (new UnityDot (dots [i].x, dots [i].y, drawer.DrawTop (dots [i].x, dots [i].y)));
 		}
-		drawLines (dots);
+		drawLines (dots, 1f);
 	}
 
-	protected void drawLines(List<Dot> dots){
+	protected void drawLines(List<Dot> dots, float width){
 		for (int i = 0; i < dots.Count; i++) {
 			if(i==dots.Count-1){
-				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [0].x, dots [0].y, 0f), Color.white, 1f);
+				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [0].x, dots [0].y, 0f), Color.white, width);
 			}
 			else{
-				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [(i+1)].x, dots [(i+1)].y, 0f), Color.white, 1f);
+				drawer.DrawLine (new Vector3 (dots [i].x, dots [i].y, 0f), new Vector3 (dots [(i+1)].x, dots [(i+1)].y, 0f), Color.white, width);
 			}
 		}
 	}
@@ -229,7 +229,7 @@ public class Polygon {
 		addToList(circuit, 
 			tops.FindIndex (x => x.x == leftDownCorner.x && x.y == leftDownCorner.y), 
 			tops.FindIndex (x => x.x == firstKnownPointLeft.x && x.y == firstKnownPointLeft.y));
-		drawLines (circuit);
+		drawLines (circuit, 2f);
 		drawer.SetTopsText(circuit.Count);
 		drawer.SetCircuitText (calculateCircuit (circuit));
 	}
