@@ -2136,10 +2136,9 @@ MonoBehaviour:
   - {fileID: 1740121332571974, guid: 4db791a3613d50b4db4bdcbb24ce0514, type: 2}
   - {fileID: 1415504169489620, guid: cddb8b29a9eb8854c867c309a1dc229a, type: 2}
   - {fileID: 1316997192417738, guid: 4db623941932578439e73b5c8fae7c06, type: 2}
-  - {fileID: 1740121332571974, guid: bf9f4156abf14ff4497966bd38ef11a3, type: 2}
+  - {fileID: 1547476793622456, guid: e6ad5b6eb2a3a48469cb284303cdd6e8, type: 2}
   - {fileID: 1976794955968148, guid: 6b2511a2684ea3a4a963d9ca18a0c21c, type: 2}
   - {fileID: 1773093733025782, guid: 462450d7987165644b0db1a0b1acd974, type: 2}
-  - {fileID: 1547476793622456, guid: e6ad5b6eb2a3a48469cb284303cdd6e8, type: 2}
   buttonPrefab: {fileID: 1531158849520180, guid: a7856a9d73d5a874cb91d6a0753077f2,
     type: 2}
   canvasPanel: {fileID: 1510101201}

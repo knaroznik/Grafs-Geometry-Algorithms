@@ -362,7 +362,28 @@ public class Polygon {
 
 
 	protected void fourthVersion_minAndMaxToCalculate (){
+		Dot firstKnownPointRight = findMINPointsRIGHT();
+		Dot firstKnownPointLeft = findMINPointsLEFT ();
 
+		Dot lastKnownPointRight = findMAXPointsRIGHT();
+		Dot lastKnownPointLeft = findMAXPointsLEFT ();
+
+		List<Dot> circuit = new List<Dot> ();
+		circuit.Add (leftUpCorner);
+		circuit.Add (rightUpCorner);
+		addToList (circuit, 
+			tops.FindIndex (x => x.x == firstKnownPointRight.x && x.y == firstKnownPointRight.y), 
+			tops.FindIndex (x => x.x == lastKnownPointRight.x && x.y == lastKnownPointRight.y));
+		circuit.Add (rightDownCorner);
+		circuit.Add (leftDownCorner);
+		addSince (circuit, 
+			tops.FindIndex (x => x.x == lastKnownPointLeft.x && x.y == lastKnownPointLeft.y), 
+			firstKnownPointLeft);
+		circuit.Add (firstKnownPointLeft);
+
+		drawLines (circuit, 2f);
+		drawer.SetTopsText(circuit.Count);
+		drawer.SetCircuitText (calculateCircuit (circuit));
 	}
 
 
