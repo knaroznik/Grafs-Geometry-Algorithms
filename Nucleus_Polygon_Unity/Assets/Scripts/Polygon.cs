@@ -213,6 +213,7 @@ public class Polygon {
 			return;
 		} else {
 			fourthVersion_minAndMaxToCalculate ();
+			return;
 		}
 	}
 
@@ -240,6 +241,83 @@ public class Polygon {
 		}
 	}
 
+	protected void addSince(List<Dot> toAddList, int firstIndex, Dot lastDot){
+		int i = firstIndex;
+		int maxCount = firstIndex + tops.Count;
+		while (getDot(i) != lastDot) {
+			if (i > maxCount) {
+				return;
+			}
+			toAddList.Add (tops [i]);
+			i++;
+		}
+	}
+
+
+	protected void thirdVersion_minInPolygon_maxToCalculate(){
+		Dot lastKnownPointRight = findMAXPointsRIGHT();
+		Dot lastKnownPointLeft = findMAXPointsLEFT ();
+		List<Dot> circuit = new List<Dot> ();
+		circuit.Add (leftUpCorner);
+		addToList (circuit, 
+			tops.FindIndex (x => x.x == rightUpCorner.x && x.y == rightUpCorner.y), 
+			tops.FindIndex (x => x.x == lastKnownPointRight.x && x.y == lastKnownPointRight.y));
+		circuit.Add (rightDownCorner);
+		circuit.Add (leftDownCorner);
+		addSince (circuit, 
+			tops.FindIndex (x => x.x == lastKnownPointLeft.x && x.y == lastKnownPointLeft.y), 
+			leftUpCorner);
+
+		drawLines (circuit, 2f);
+		drawer.SetTopsText(circuit.Count);
+		drawer.SetCircuitText (calculateCircuit (circuit));
+	}
+
+	//FIXME : Better code for 4 of this : 
+
+	protected Dot findMAXPointsRIGHT(){
+		Dot up = new Dot(999,999);
+		Dot down = new Dot(999,999);
+		for (int i = 0; i < tops.Count; i++) {
+			if (maxs.Contains (tops [i]) || mins.Contains (tops [i])) {
+				continue;
+			}
+
+			if (tops [i].y >= MAX.y && Geometry.distance(tops[i].y, MAX.y) < Geometry.distance(up.y, MAX.y) && tops[i].x >= MAX.x) {
+				up = tops [i];
+			}
+
+			if (tops [i].y <= MAX.y && Geometry.distance(tops[i].y, MAX.y) < Geometry.distance(down.y, MAX.y) && tops[i].x >= MAX.x) {
+				down = tops [i];
+			}
+		}
+
+		rightDownCorner = Geometry.pointofIntersection (new Block (up, down), new Block (MAX, new Dot (MAX.x + 1, MAX.y)));
+		drawer.DrawImportantObject (rightDownCorner.x, rightDownCorner.y);
+		return up;
+	}
+
+	protected Dot findMAXPointsLEFT(){
+		Dot up = new Dot(999,999);
+		Dot down = new Dot(999,999);
+		for (int i = 0; i < tops.Count; i++) {
+			if (maxs.Contains (tops [i]) || mins.Contains (tops [i])) {
+				continue;
+			}
+
+			if (tops [i].y >= MAX.y && Geometry.distance(tops[i].y, MAX.y) < Geometry.distance(up.y, MAX.y) && tops[i].x <= MAX.x) {
+				up = tops [i];
+			}
+
+			if (tops [i].y <= MAX.y && Geometry.distance(tops[i].y, MAX.y) < Geometry.distance(down.y, MAX.y) && tops[i].x <= MAX.x) {
+				down = tops [i];
+			}
+		}
+		leftDownCorner = Geometry.pointofIntersection (new Block (up, down), new Block (MAX, new Dot (MAX.x + 1, MAX.y)));
+		drawer.DrawImportantObject (leftDownCorner.x, leftDownCorner.y);
+		return up;
+	}
+
 	protected Dot findMINPointsRIGHT(){
 		Dot up = new Dot(999,999);
 		Dot down = new Dot(999,999);
@@ -248,11 +326,11 @@ public class Polygon {
 				continue;
 			}
 
-			if (tops [i].y >= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(up.y, MIN.y) && tops[i].x > MIN.x) {
+			if (tops [i].y >= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(up.y, MIN.y) && tops[i].x >= MIN.x) {
 				up = tops [i];
 			}
 
-			if (tops [i].y <= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(down.y, MIN.y) && tops[i].x > MIN.x) {
+			if (tops [i].y <= MIN.y && Geometry.distance(tops[i].y, MIN.y) < Geometry.distance(down.y, MIN.y) && tops[i].x >= MIN.x) {
 				down = tops [i];
 			}
 		}
@@ -282,9 +360,6 @@ public class Polygon {
 		return down;
 	}
 
-	protected void thirdVersion_minInPolygon_maxToCalculate(){
-
-	}
 
 	protected void fourthVersion_minAndMaxToCalculate (){
 
@@ -323,7 +398,7 @@ public class Polygon {
 			}
 		}
 
-		if (rightUpCorner.x > leftUpCorner.x) {
+		if (rightUpCorner.x < leftUpCorner.x) {
 			Dot temp = rightUpCorner;
 			rightUpCorner = leftUpCorner;
 			leftUpCorner = temp;
