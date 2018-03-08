@@ -5,19 +5,17 @@ using UnityEngine.UI;
 
 public class PolygonDrawer : MonoBehaviour {
 
-	public List<Dot> userTops;
-
 	public GameObject topPrefab;
 	public GameObject lineRenderPrefab;
 	public GameObject importantPrefab;
 
-	public List<Dot> debug;
-
 	protected GameObject scenePolygon;
+
+	[SerializeField] private List<Dot> userTops;
 	protected SceneBehaviour sceneBehaviour;
 
 	// Use this for initialization
-	void Start () {
+	private void Start () {
 		scenePolygon = new GameObject ();
 		scenePolygon.name = this.name + " polygon";
 		sceneBehaviour = FindObjectOfType<SceneBehaviour> ();
@@ -42,7 +40,7 @@ public class PolygonDrawer : MonoBehaviour {
 		Instantiate (importantPrefab, new Vector3 (x, y, 0f), Quaternion.identity, scenePolygon.transform);
 	}
 
-	public void DrawLine(Vector3 one, Vector3 two, Color color, float width){
+	public GameObject DrawLine(Vector3 one, Vector3 two, Color color, float width){
 		GameObject renderObj = Instantiate (lineRenderPrefab, scenePolygon.transform) as GameObject;
 		LineRenderer renderer = renderObj.GetComponent<LineRenderer> ();
 		renderer.SetPosition (0, one);
@@ -52,6 +50,7 @@ public class PolygonDrawer : MonoBehaviour {
 
 		renderer.startWidth = width;
 		renderer.endWidth = width;
+		return renderObj;
 	}
 
 	public void DrawLine(Dot one, Dot two, Color color, float width){

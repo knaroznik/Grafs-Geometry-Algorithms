@@ -4,11 +4,22 @@ using UnityEngine;
 
 public class Block {
 
-	public Dot pointA;
-	public Dot pointB;
+	public readonly Dot pointA;
+	public readonly Dot pointB;
 
 	public Block(Dot a, Dot b){
 		pointA = a;
 		pointB = b;
 	}
+
+	public float Length()
+	{
+		return Geometry.distance (pointA, pointB);
+	}
+
+	public float LengthSquared()
+	{
+		return Geometry.distanceSquared (pointA, pointB);
+	}
+
 }

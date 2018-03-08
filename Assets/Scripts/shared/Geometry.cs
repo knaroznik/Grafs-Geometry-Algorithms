@@ -8,6 +8,10 @@ public static class Geometry{
 		return Mathf.Sqrt (Mathf.Pow(b.x - a.x, 2) + Mathf.Pow(b.y - a.y, 2));
 	}
 
+	public static float distanceSquared(Dot a, Dot b){
+		return Mathf.Pow(b.x - a.x, 2) + Mathf.Pow(b.y - a.y, 2);
+	}
+
 	public static float distance(float a_y, float b_y){
 		return Mathf.Sqrt (Mathf.Pow(0 - 0, 2) + Mathf.Pow(b_y - a_y, 2));
 	}
