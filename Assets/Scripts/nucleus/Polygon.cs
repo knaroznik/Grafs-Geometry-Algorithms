@@ -7,8 +7,7 @@ public class Polygon {
 	#region Starting : 
 	protected PolygonDrawer drawer;
 
-	public List<UnityDot> tops;
-	protected List<Dot> topsAsDots;
+	public List<Dot> tops;
 
 	protected Dot MAX;
 	protected Dot MIN;
@@ -26,11 +25,8 @@ public class Polygon {
 		
 	public Polygon(PolygonDrawer drawer, List<Dot> dots){
 		this.drawer = drawer;
-		tops = new List<UnityDot> ();
-		topsAsDots = dots;
-		for (int i = 0; i < dots.Count; i++) {
-			tops.Add (new UnityDot (dots [i].x, dots [i].y, drawer.DrawTop (dots [i].x, dots [i].y)));
-		}
+		tops = new List<Dot> ();
+		tops = dots;
 		drawLines (dots, 1f);
 	}
 
@@ -472,14 +468,6 @@ public class Polygon {
 	}
 
 	protected float calculateCircuit(List<Dot> points){
-		float output = 0;
-		for (int i = 0; i < points.Count; i++) {
-			output += Geometry.distance (points[(i % points.Count + points.Count)%points.Count], points[(i+1 % points.Count + points.Count)%points.Count]);
-		}
-		return output;
-	}
-
-	protected float calculateCircuit(List<UnityDot> points){
 		float output = 0;
 		for (int i = 0; i < points.Count; i++) {
 			output += Geometry.distance (points[(i % points.Count + points.Count)%points.Count], points[(i+1 % points.Count + points.Count)%points.Count]);
