@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Diagnostics;
 using UnityEngine.EventSystems;
 
 public class ClosestSceneBehaviour : PolygonDrawer {
 
 	protected List<Dot> dots = new List<Dot> ();
 	protected GameObject currentBlock;
+
+	public double bruteTime = 0;
+	public double recursiveTime = 0;
 
 	private void Start(){
 		scenePolygon = new GameObject ();
@@ -34,24 +38,97 @@ public class ClosestSceneBehaviour : PolygonDrawer {
 	}
 
 	public void calculate(){
-		closest_points_BruteForce ();
-	}
+		Stopwatch x = Stopwatch.StartNew ();
+		closest_points_BruteForce (dots);
+		x.Stop ();
+		bruteTime = x.Elapsed.TotalMilliseconds;
 
-	private void closest_points_BruteForce(){
-		int n = dots.Count;
 
-		if (n <= 1) {
-			return;
-		}
+		Block b = MyClosestDivide ();
 
-		Block result = Enumerable.Range( 0, n-1)
-			.SelectMany( i => Enumerable.Range( i+1, n-(i+1) )
-				.Select( j => new Block( dots[i], dots[j] )))
-			.OrderBy( seg => seg.LengthSquared())
-			.First();
+
 		if (currentBlock != null) {
 			Destroy (currentBlock);
 		}
-		currentBlock = DrawLine (new Vector3(result.pointA.x, result.pointA.y, 0f), new Vector3(result.pointB.x, result.pointB.y, 0f), Color.white, 1f);
+		currentBlock = DrawLine (new Vector3(b.pointA.x, b.pointA.y, 0f), new Vector3(b.pointB.x, b.pointB.y, 0f), Color.white, 1f);
+
+	}
+
+	private Block closest_points_BruteForce(List<Dot> input){
+		int n = input.Count;
+
+		if (n <= 1) {
+			return null;
+		}
+		Block result = Enumerable.Range( 0, n-1)
+			.SelectMany( i => Enumerable.Range( i+1, n-(i+1) )
+				.Select( j => new Block( input[i], input[j] )))
+			.OrderBy( seg => seg.LengthSquared())
+			.First();
+		return result;
+	}
+
+	public Block MyClosestDivide()
+	{
+		List<Dot> sorted = dots.OrderBy (p => p.x).ToList ();
+		Stopwatch y = Stopwatch.StartNew ();
+		Block b = MyClosestRec(sorted);
+		y.Stop ();
+		recursiveTime = y.Elapsed.TotalMilliseconds;
+		return b;
+	}
+
+	private Block MyClosestRec(List<Dot> pointsByX){
+		
+		int count = pointsByX.Count;
+		if (count <= 3) {
+			return closest_points_BruteForce (pointsByX);
+		}
+
+		Dot midPoint = pointsByX[count/2];
+
+		List<Dot> leftByX = pointsByX.Take(count/2).ToList();
+		Block leftResult = MyClosestRec(leftByX);
+
+		var rightByX = pointsByX.Skip(count/2).ToList();
+		var rightResult = MyClosestRec(rightByX);
+
+		var result = rightResult.Length() < leftResult.Length() ? rightResult : leftResult;
+
+		List<Dot> strip = new List<Dot> ();
+		int j = 0;
+		for (int i = 0; i < count; i++) {
+			if (Mathf.Abs (pointsByX [i].x - midPoint.x) < result.Length ()) {
+				strip.Add(pointsByX [i]);
+				j++;
+			}
+		}
+
+
+		Block a = stripClosest (strip, j, result.Length ());
+		Block b = result;
+
+		if (a.Length () > b.Length()) {
+			return b;
+		} else {
+			return a;
+		}
+	}
+
+	Block stripClosest(List<Dot> strip, int size, float d)
+	{
+		float min = d;
+		Block output = new Block(new Dot(999,999), new Dot(-999, -999));
+		List<Dot> stripY = strip.OrderBy (p => p.y).ToList ();
+		for (int i = 0; i < size; ++i) {
+			for (int j = i + 1; j < size && (stripY [j].y - stripY [i].y) < min; ++j) {
+				if (Geometry.distance (stripY [i], stripY [j]) < min) {
+					output = new Block (stripY [i], stripY [j]);
+					min = Geometry.distance (stripY [i], stripY [j]);
+				}
+			}
+		}
+
+		return output;
 	}
 }
