@@ -4,14 +4,18 @@ using UnityEngine;
 using System.Linq;
 using System.Diagnostics;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ClosestSceneBehaviour : PolygonDrawer {
 
 	protected List<Dot> dots = new List<Dot> ();
 	protected GameObject currentBlock;
 
-	public double bruteTime = 0;
-	public double recursiveTime = 0;
+	double bruteTime = 0;
+	double recursiveTime = 0;
+
+	public Text timeInfo;
+	public Text blockInfo;
 
 	private void Start(){
 		scenePolygon = new GameObject ();
@@ -51,7 +55,17 @@ public class ClosestSceneBehaviour : PolygonDrawer {
 			Destroy (currentBlock);
 		}
 		currentBlock = DrawLine (new Vector3(b.pointA.x, b.pointA.y, 0f), new Vector3(b.pointB.x, b.pointB.y, 0f), Color.white, 1f);
+		blockInfo.text = "Closest points : " + b.pointA.ToString () + ", " + b.pointB.ToString ();
+		timeInfo.text = "Brutal Time : " + bruteTime + " and cad time : " + recursiveTime;
+	}
 
+	public void generate(){
+		for (int i = 0; i < 100; i++) {
+			float x = Random.Range (-50f, 50f);
+			float y = Random.Range (-50f, 50f);
+			dots.Add (new Dot (x, y));
+			DrawTop (x, y);
+		}
 	}
 
 	private Block closest_points_BruteForce(List<Dot> input){

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 [System.Serializable]
 public class Dot {
@@ -15,6 +16,6 @@ public class Dot {
 
 	public override string ToString ()
 	{
-		return x.ToString () + "," + y.ToString ();
+		return Math.Round(x, 2).ToString () + "," + Math.Round(y, 2).ToString ();
 	}
 }
