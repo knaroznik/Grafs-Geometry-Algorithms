@@ -35,4 +35,23 @@ public static class Geometry{
 
 		return new Dot (wx / w, wy / w);
 	}
+
+	public static void SplitListByPoint(Dot splitPoint, List<Dot> SY, ref List<Dot> left, ref List<Dot> right){
+		for (int i = 0; i < SY.Count; i++) {
+			if (SY [i].x < splitPoint.x) {
+				left.Add (SY [i]);
+			} else {
+				right.Add (SY [i]);
+			}
+		}
+	}
+
+	public static void DebugListY(List<Dot> SY){
+		string output = string.Empty;
+		for (int i = 0; i < SY.Count; i++) {
+			output += SY [i].y.ToString();
+			output += " ";
+		}
+		Debug.Log (output);
+	}
 }
