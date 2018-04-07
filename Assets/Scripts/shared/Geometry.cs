@@ -36,12 +36,35 @@ public static class Geometry{
 		return new Dot (wx / w, wy / w);
 	}
 
-	public static void SplitListByPoint(Dot splitPoint, List<Dot> SY, ref List<Dot> left, ref List<Dot> right){
+	//!!!!!! Mogło popsuć poprzedni projekt (closestPoints) 
+	//if (SY [i] == splitPoint) {
+	//	continue;
+	//}
+
+	public static void SplitListByPointByX(Dot splitPoint, List<Dot> SY, ref List<Dot> left, ref List<Dot> right){
 		for (int i = 0; i < SY.Count; i++) {
+			if (SY [i] == splitPoint) {
+				continue;
+			}
+
 			if (SY [i].x < splitPoint.x) {
 				left.Add (SY [i]);
 			} else {
 				right.Add (SY [i]);
+			}
+		}
+	}
+
+	public static void SplitListByPointByY(Dot splitPoint, List<Dot> SX, ref List<Dot> left, ref List<Dot> right){
+		for (int i = 0; i < SX.Count; i++) {
+			if (SX [i] == splitPoint) {
+				continue;
+			}
+
+			if (SX [i].y < splitPoint.y) {
+				left.Add (SX [i]);
+			} else {
+				right.Add (SX [i]);
 			}
 		}
 	}

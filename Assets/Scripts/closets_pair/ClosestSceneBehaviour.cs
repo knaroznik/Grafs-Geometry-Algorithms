@@ -109,7 +109,7 @@ public class ClosestSceneBehaviour : PolygonDrawer {
 		List<Dot> leftByY = new List<Dot> ();
 		List<Dot> rightByY = new List<Dot> ();
 
-		Geometry.SplitListByPoint (midPoint, SY, ref leftByY, ref rightByY);
+		Geometry.SplitListByPointByX (midPoint, SY, ref leftByY, ref rightByY);
 
 		Block leftResult = MyClosestRec(leftByX, leftByY);
 		Block rightResult = MyClosestRec(rightByX, rightByY);
