@@ -36,7 +36,7 @@ public class ClosestSceneBehaviour : PolygonDrawer {
 		}
 	}
 
-	protected void createDot(){
+	protected virtual void createDot(){
 		Vector3 v = Camera.main.ScreenToWorldPoint (new Vector3(Input.mousePosition.x,Input.mousePosition.y, -Camera.main.transform.position.z));
 		dots.Add (new Dot (v.x, v.y));
 		DrawTop (v.x, v.y);

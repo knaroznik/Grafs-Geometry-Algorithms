@@ -69,6 +69,34 @@ public static class Geometry{
 		}
 	}
 
+	public static void SplitListByPointByX(DotWithName splitPoint, List<DotWithName> SY, ref List<DotWithName> left, ref List<DotWithName> right){
+		for (int i = 0; i < SY.Count; i++) {
+			if (SY [i] == splitPoint) {
+				continue;
+			}
+
+			if (SY [i].x < splitPoint.x) {
+				left.Add (SY [i]);
+			} else {
+				right.Add (SY [i]);
+			}
+		}
+	}
+
+	public static void SplitListByPointByY(DotWithName splitPoint, List<DotWithName> SX, ref List<DotWithName> left, ref List<DotWithName> right){
+		for (int i = 0; i < SX.Count; i++) {
+			if (SX [i] == splitPoint) {
+				continue;
+			}
+
+			if (SX [i].y < splitPoint.y) {
+				left.Add (SX [i]);
+			} else {
+				right.Add (SX [i]);
+			}
+		}
+	}
+
 	public static void DebugListY(List<Dot> SY){
 		string output = string.Empty;
 		for (int i = 0; i < SY.Count; i++) {

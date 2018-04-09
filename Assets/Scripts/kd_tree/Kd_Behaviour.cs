@@ -4,42 +4,50 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 
-public class Kd_Behaviour : MonoBehaviour {
+public class Kd_Behaviour : ClosestSceneBehaviour {
 
-	public List<Dot> input = new List<Dot> ();
+	private List<DotWithName> Names = new List<DotWithName> ();
 	public Text sceneText;
 	private string output;
 
+	private List<string> letters = new List<string>(){"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"};
+	private int currentLetter = 0;
+
+	public GameObject letterPrefab;
+
 	void Start(){
-		Kd_Node tree = calculateTree (input);
+		scenePolygon = new GameObject ();
+		scenePolygon.name = "ClosestPointProblem";
+	}
+
+	public void buttonClicked(){
+		Kd_Node tree = calculateTree (Names);
 		output = "";
 		PrintTree (tree, "");
 		sceneText.text = output;
 	}
 
-	public Kd_Node calculateTree(List<Dot> dots){
-		List<Dot> sortedX = dots.OrderBy (p => p.x).ToList ();
-		List<Dot> sortedY = dots.OrderBy (p => p.y).ToList ();
+	public Kd_Node calculateTree(List<DotWithName> dots){
+		List<DotWithName> sortedX = dots.OrderBy (p => p.x).ToList ();
+		List<DotWithName> sortedY = dots.OrderBy (p => p.y).ToList ();
 		return makeTree (sortedX, sortedY, true);
 	}
 
-	public Kd_Node makeTree(List<Dot> SX,List<Dot> SY, bool xCheck){
+	public Kd_Node makeTree(List<DotWithName> SX,List<DotWithName> SY, bool xCheck){
 		int count = SX.Count;
 		Kd_Node node = new Kd_Node ();
 		if (xCheck) {
-			Debug.Log ("X");
 			node.point = SX [SX.Count / 2];
 		} else {
-			Debug.Log ("Y");
 			node.point = SY [SY.Count / 2];
 		}
 
 
-		List<Dot> leftByX = new List<Dot> ();
-		List<Dot> rightByX = new List<Dot> ();
+		List<DotWithName> leftByX = new List<DotWithName> ();
+		List<DotWithName> rightByX = new List<DotWithName> ();
 
-		List<Dot> leftByY = new List<Dot> ();
-		List<Dot> rightByY = new List<Dot> ();
+		List<DotWithName> leftByY = new List<DotWithName> ();
+		List<DotWithName> rightByY = new List<DotWithName> ();
 
 		if (xCheck) {
 			Geometry.SplitListByPointByX (node.point, SY, ref leftByY, ref rightByY);
@@ -69,9 +77,22 @@ public class Kd_Behaviour : MonoBehaviour {
 		if (tree == null) {
 			return;
 		}
-		output+=indent + "+- " + tree.point.ToString() + "\n";
+		output+=indent + "+- " + tree.point.alias + "\n";
 		indent += "|  ";
 		PrintTree(tree.left, indent);
 		PrintTree(tree.right, indent);
+	}
+
+	protected override void createDot ()
+	{
+		Vector3 v = Camera.main.ScreenToWorldPoint (new Vector3(Input.mousePosition.x,Input.mousePosition.y, -Camera.main.transform.position.z));
+		Names.Add (new DotWithName (v.x, v.y, letters [currentLetter]));
+		createLetter (v.x, v.y);
+	}
+
+	protected void createLetter(float x, float y){
+		GameObject letter = Instantiate (letterPrefab, new Vector3 (x, y, 0f), Quaternion.identity, scenePolygon.transform) as GameObject;
+		letter.GetComponentInChildren<Text> ().text = letters [currentLetter];
+		currentLetter++;
 	}
 }
