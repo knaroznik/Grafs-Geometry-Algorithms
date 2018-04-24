@@ -16,6 +16,6 @@ public class Dot {
 
 	public override string ToString ()
 	{
-		return Math.Round(x, 2).ToString () + "," + Math.Round(y, 2).ToString ();
+		return "(" + Math.Round(x, 2).ToString () + "," + Math.Round(y, 2).ToString () + ")";
 	}
 }

@@ -13,6 +13,10 @@ public class Printer : MonoBehaviour {
 		return Instantiate (prefab, pos, Quaternion.identity, parent) as GameObject;
 	}
 
+	public GameObject PrintObject(GameObject prefab, float x, float y, Transform parent){
+		return Instantiate (prefab, new Vector3 (x, y, 0f), Quaternion.identity, parent) as GameObject;
+	}
+
 	public GameObject PrintLine(GameObject prefab, Transform parent, Vector3 one, Vector3 two, Material color, float width, bool debug){
 		if (debug) {
 			Debug.Log ("Printing line from : " + one.ToString () + " to " + two.ToString ());
