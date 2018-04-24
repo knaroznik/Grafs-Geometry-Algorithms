@@ -16,7 +16,7 @@ public class Stack {
 	}
 
 	public void Push(List<GameObject> input){
-		for (int i = 0; i < input.Count; i++) {
+		for (int i = input.Count -1; i >= 0; i--) {
 			stack.Add (input [i]);
 		}
 	}
@@ -25,10 +25,11 @@ public class Stack {
 		if (stack.Count <= 0) {
 			return null;
 		}
-		GameObject output = stack [0];
-		stack.RemoveAt (0);
+		GameObject output = stack [stack.Count-1];
+		stack.RemoveAt (stack.Count - 1);
 		return output;
 	}
+
 
 	public GameObject First(){
 		return stack [0];
@@ -67,7 +68,11 @@ public class Stack {
 				stack.RemoveAt (i);
 			}
 		}
-		stack.Remove (Last ());
-		stack.Remove (Last ());
+		stack.Remove (First ());
+		stack.Remove (First ());
+	}
+
+	public List<GameObject> CopyTo(){
+		return stack;
 	}
 }

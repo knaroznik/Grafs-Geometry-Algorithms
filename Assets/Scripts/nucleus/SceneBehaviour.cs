@@ -5,43 +5,49 @@ using UnityEngine.UI;
 
 public class SceneBehaviour : MonoBehaviour {
 
-	public List<GameObject> polygons;
-	public GameObject buttonPrefab;
+	[SerializeField] private List<GameObject> polygons;
+	[SerializeField] private GameObject buttonPrefab;
 
-	public Transform canvasPanel;
+	[SerializeField] private Transform canvasPanel;
 
 	private GameObject currentPolygon;
 
-	GameObject obj;
-	Button but;
+	private GameObject buttonObject;
+	private Button buttonComponent;
 
 	[Header("Texts")]
-
-	public GameObject kernelFound;
-	public GameObject circuit;
-	public GameObject topsCount;
+	[SerializeField] private GameObject kernelFound;
+	[SerializeField] private GameObject circuit;
+	[SerializeField] private GameObject topsCount;
 
 	void Start(){
+		InstantiateButtons ();
+	}
+
+	private void InstantiateButtons(){
 		for (int i = 0; i < polygons.Count; i++) {
-			obj = Instantiate (buttonPrefab, canvasPanel) as GameObject;
-			obj.GetComponentInChildren<Text> ().text = polygons [i].name;
-			but = obj.GetComponent<Button> ();
+			buttonObject = Instantiate (buttonPrefab, canvasPanel) as GameObject;
+			buttonObject.GetComponentInChildren<Text> ().text = polygons [i].name;
+			buttonComponent = buttonObject.GetComponent<Button> ();
 			GameObject x = polygons[i];
-			but.onClick.AddListener (delegate {
+			buttonComponent.onClick.AddListener (delegate {
 				if(currentPolygon != null){
 					currentPolygon.GetComponent<PolygonDrawer>().Clear();
 				}
 				currentPolygon = Instantiate(x) as GameObject;
 			});
 		}
+	}
 
-		//Exit button : 
+	public GameObject KernelFound(){
+		return kernelFound;
+	}
 
-		obj = Instantiate (buttonPrefab, canvasPanel) as GameObject;
-		obj.GetComponentInChildren<Text> ().text = "EXIT";
-		but = obj.GetComponent<Button> ();
-		but.onClick.AddListener (delegate {
-			Application.Quit();
-		});
+	public GameObject Circuit(){
+		return circuit;
+	}
+
+	public GameObject TopsCount(){
+		return topsCount;
 	}
 }

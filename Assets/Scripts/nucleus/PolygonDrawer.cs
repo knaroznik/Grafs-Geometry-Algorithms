@@ -69,21 +69,20 @@ public class PolygonDrawer : MonoBehaviour {
 		Destroy (scenePolygon);
 		Destroy (this.gameObject);
 	}
-
-
+		
 	public void SetKernelText(bool _hasKernel){
 		if (_hasKernel) {
-			sceneBehaviour.kernelFound.GetComponent<Text> ().text = "Kernel found";
+			sceneBehaviour.KernelFound().GetComponent<Text> ().text = "Kernel found";
 		} else {
-			sceneBehaviour.kernelFound.GetComponent<Text> ().text = "Kernel not found";
+			sceneBehaviour.KernelFound().GetComponent<Text> ().text = "Kernel not found";
 		}
 	}
 
 	public void SetCircuitText(float circuit){
-		sceneBehaviour.circuit.GetComponent<Text> ().text = "Circuit : " + circuit;
+		sceneBehaviour.Circuit().GetComponent<Text> ().text = "Circuit : " + circuit;
 	}
 
 	public void SetTopsText(int tops){
-		sceneBehaviour.topsCount.GetComponent<Text> ().text = "Tops in circuit : " + tops;
+		sceneBehaviour.TopsCount().GetComponent<Text> ().text = "Tops in circuit : " + tops;
 	}
 }

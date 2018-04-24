@@ -475,6 +475,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dotPrefab: {fileID: 1867890583090900, guid: c877611195651db4b837f440659b509f, type: 2}
   linePrefab: {fileID: 1059692284094978, guid: 04f641ca9c65ce24082e78a831e37888, type: 2}
+  importantPrefab: {fileID: 1916806724135052, guid: 2d457a744b8636e4eb377d3dfbac8894,
+    type: 2}
   whiteMaterial: {fileID: 2100000, guid: fb1d4c49eabc42343915b5b6c876e9b9, type: 2}
   redMaterial: {fileID: 2100000, guid: f520c2f49d5ee774e8c5a711871cf8d7, type: 2}
   greenMaterial: {fileID: 2100000, guid: 5ec948f30fc321342b5a77f536c52176, type: 2}

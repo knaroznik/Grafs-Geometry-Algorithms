@@ -12,6 +12,7 @@ public class Triangulation : MonoBehaviour {
 
 	[SerializeField] private GameObject dotPrefab;
 	[SerializeField] private GameObject linePrefab;
+	[SerializeField] private GameObject importantPrefab;
 	[SerializeField] private Material whiteMaterial;
 	[SerializeField] private Material redMaterial;
 	[SerializeField] private Material greenMaterial;
@@ -21,6 +22,8 @@ public class Triangulation : MonoBehaviour {
 
 	private List<GameObject> top = new List<GameObject>();
 	private List<GameObject> down = new List<GameObject> ();
+
+	private List<GameObject> debugList = new List<GameObject> ();
 
 
 	// Use this for initialization
@@ -105,7 +108,8 @@ public class Triangulation : MonoBehaviour {
 				s.Push (sortedByX [i]);
 			}
 			else{
-				GameObject lastObj = s.Pop ();
+				GameObject lastObj = null;
+				s.Remove (s.First ());
 				List<GameObject> tmp = new List<GameObject> ();
 				int count = s.Count ();
 				for(int q=0; q<count; q++){
@@ -116,17 +120,20 @@ public class Triangulation : MonoBehaviour {
 						tmp.Add (lastObj);
 					}
 				}
+
 				s.Push (tmp);
 				s.Push (lastObj);
 				s.Push (sortedByX [i]);
 
 			}
+
+			//DebugStack (s.CopyTo());
 		}
 
-		s.DebugStack ();
-		s.DeleteFirstAndLast ();
-		Debug.Log ("NEXT");
-		s.DebugStack ();
+//		s.DebugStack ();
+//		s.DeleteFirstAndLast ();
+//		Debug.Log ("NEXT");
+//		s.DebugStack ();
 
 		int x = s.Count ();
 		for (int i = 0; i < x; i++) {
@@ -137,6 +144,19 @@ public class Triangulation : MonoBehaviour {
 				whiteMaterial, 2f, false);
 		}
 	}
+
+
+	private void DebugStack(List<GameObject> stack){
+		for (int i = 0; i < debugList.Count; i++) {
+			Destroy (debugList [i]);
+		}
+		debugList.Clear ();
+
+		for (int i = 0; i < stack.Count; i++) {
+			debugList.Add (m_printer.PrintObject (importantPrefab, stack[i].transform.position, prefabParent.transform));
+		}
+	}
+
 
 	private bool sameLane(GameObject x, GameObject y){
 		if (top.Contains (x) && top.Contains (y))

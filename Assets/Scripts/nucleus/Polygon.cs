@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Polygon {
 
-	#region Starting : 
 	protected PolygonDrawer drawer;
 
 	public List<Dot> tops;
@@ -185,10 +184,6 @@ public class Polygon {
 			}
 		}
 	}
-
-	#endregion
-
-	#region Circuit : 
 
 
 	protected Dot leftDownCorner, rightDownCorner, rightUpCorner, leftUpCorner;
@@ -474,6 +469,4 @@ public class Polygon {
 		}
 		return output;
 	}
-
-	#endregion
 }
