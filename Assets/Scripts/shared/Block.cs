@@ -22,4 +22,8 @@ public class Block {
 		return Geometry.distanceSquared (pointA, pointB);
 	}
 
+	public override string ToString(){
+		return pointA.ToString() + " " + pointB.ToString ();
+	}
+
 }

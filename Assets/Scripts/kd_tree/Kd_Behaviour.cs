@@ -3,21 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class Kd_Behaviour : ClosestSceneBehaviour {
+public class Kd_Behaviour : MonoBehaviour {
 
 	private List<DotWithName> Names = new List<DotWithName> ();
-	public Text sceneText;
 	private string output;
-
 	private List<string> letters = new List<string>(){"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"};
 	private int currentLetter = 0;
+	private GameObject scenePolygon;
 
-	public GameObject letterPrefab;
+	[SerializeField] private GameObject letterPrefab;
+	[SerializeField] private Text sceneText;
 
 	void Start(){
 		scenePolygon = new GameObject ();
 		scenePolygon.name = "ClosestPointProblem";
+	}
+
+	void Update(){
+		clickPressed ();
+	}
+
+	protected void clickPressed(){
+		if (Input.GetMouseButtonDown (0)) {
+			if (EventSystem.current.currentSelectedGameObject != null && EventSystem.current.currentSelectedGameObject.layer == 5) {
+				return;
+			}
+			createDot ();
+		}
 	}
 
 	public void buttonClicked(){
@@ -57,8 +71,6 @@ public class Kd_Behaviour : ClosestSceneBehaviour {
 			Geometry.SplitListByPointByY (node.point, SX, ref leftByX, ref rightByX);
 		}
 
-		Debug.Log (leftByX.Count +  " " + rightByX.Count);
-
 		if (rightByX.Count > 0) {
 			node.right = makeTree (rightByX, rightByY, !xCheck);
 		} else {
@@ -83,16 +95,17 @@ public class Kd_Behaviour : ClosestSceneBehaviour {
 		PrintTree(tree.right, indent);
 	}
 
-	protected override void createDot ()
+	protected virtual void createDot ()
 	{
 		Vector3 v = Camera.main.ScreenToWorldPoint (new Vector3(Input.mousePosition.x,Input.mousePosition.y, -Camera.main.transform.position.z));
 		Names.Add (new DotWithName (v.x, v.y, letters [currentLetter]));
 		createLetter (v.x, v.y);
 	}
 
-	protected void createLetter(float x, float y){
+	protected virtual void createLetter(float x, float y){
 		GameObject letter = Instantiate (letterPrefab, new Vector3 (x, y, 0f), Quaternion.identity, scenePolygon.transform) as GameObject;
 		letter.GetComponentInChildren<Text> ().text = letters [currentLetter];
 		currentLetter++;
 	}
+
 }

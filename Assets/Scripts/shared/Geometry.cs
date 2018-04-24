@@ -36,11 +36,6 @@ public static class Geometry{
 		return new Dot (wx / w, wy / w);
 	}
 
-	//!!!!!! Mogło popsuć poprzedni projekt (closestPoints) 
-	//if (SY [i] == splitPoint) {
-	//	continue;
-	//}
-
 	public static void SplitListByPointByX(Dot splitPoint, List<Dot> SY, ref List<Dot> left, ref List<Dot> right){
 		for (int i = 0; i < SY.Count; i++) {
 			if (SY [i] == splitPoint) {
@@ -104,5 +99,129 @@ public static class Geometry{
 			output += " ";
 		}
 		Debug.Log (output);
+	}
+
+	/// <summary>
+	///	Checking if line is inside polygon.
+	/// </summary>
+	/// <returns><c>true</c>, if line inside polygon, <c>false</c> otherwise.</returns>
+	/// <param name="polygon">Polygon.</param>
+	/// <param name="isClosed">If set to <c>true</c> is closed.</param>
+	/// <param name="A">A.</param>
+	/// <param name="B">B.</param>
+	public static bool LineInsidePolygon(List<GameObject> polygon, bool isClosed, GameObject A, GameObject B){
+		//Check if polygon is closed, otherwise we close it.
+		if (!isClosed)
+			polygon.Add (polygon [0]);
+		if (A == null || B == null) {
+			return false;
+		}
+
+		Block unknownLine = new Block (new Dot (A.transform.position.x, A.transform.position.y),
+			                    new Dot (B.transform.position.x, B.transform.position.y));
+		for (int i = 1; i < polygon.Count; i++) {
+			Block line_in_polygon = new Block (
+				new Dot(polygon[i-1].transform.position.x, polygon[i-1].transform.position.y), 
+				new Dot(polygon[i].transform.position.x, polygon[i].transform.position.y));
+
+			if (LinesInterSect (unknownLine, line_in_polygon)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/// <summary>
+	/// Checking if lines intersect.
+	/// </summary>
+	/// <returns><c>true</c>, if inter sect was linesed, <c>false</c> otherwise.</returns>
+	/// <param name="X">X.</param>
+	/// <param name="Y">Y.</param>
+	public static bool LinesInterSect(Block X, Block Y){
+
+		bool isIntersecting = false;
+
+		//3d -> 2d
+		Vector2 p1 = new Vector2(X.pointA.x, X.pointA.y);
+		Vector2 p2 = new Vector2(X.pointB.x, X.pointB.y);
+
+		Vector2 p3 = new Vector2(X.pointA.x, X.pointA.y);
+		Vector2 p4 = new Vector2(X.pointB.x, X.pointB.y);
+
+		float denominator = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
+
+		//Direction of the lines
+		Vector2 l1_dir = (p2 - p1).normalized;
+		Vector2 l2_dir = (p4 - p3).normalized;
+
+		//If we know the direction we can get the normal vector to each line
+		Vector2 l1_normal = new Vector2(-l1_dir.y, l1_dir.x);
+		Vector2 l2_normal = new Vector2(-l2_dir.y, l2_dir.x);
+
+		if (IsParallel(l1_normal, l2_normal))
+		{
+			return true;
+		}
+
+		//Make sure the denominator is > 0, if so the lines are parallel
+		if (denominator != 0)
+		{
+			float u_a = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
+			float u_b = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
+
+			//Is intersecting if u_a and u_b are between 0 and 1
+			if (u_a >= 0 && u_a <= 1 && u_b >= 0 && u_b <= 1)
+			{
+				isIntersecting = true;
+			}
+		}
+
+		return isIntersecting;
+	}
+
+	//Are 2 vectors parallel?
+	static bool IsParallel(Vector2 v1, Vector2 v2)
+	{
+		//2 vectors are parallel if the angle between the vectors are 0 or 180 degrees
+		if (Vector2.Angle(v1, v2) == 0f || Vector2.Angle(v1, v2) == 180f)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	//Are 2 vectors orthogonal?
+	static bool IsOrthogonal(Vector2 v1, Vector2 v2)
+	{
+		//2 vectors are orthogonal is the dot product is 0
+		//We have to check if close to 0 because of floating numbers
+		if (Mathf.Abs(Vector2.Dot(v1, v2)) < 0.000001f)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	//Is a point c between 2 other points a and b?
+	static bool IsBetween(Vector2 a, Vector2 b, Vector2 c)
+	{
+		bool isBetween = false;
+
+		//Entire line segment
+		Vector2 ab = b - a;
+		//The intersection and the first point
+		Vector2 ac = c - a;
+
+		//Need to check 2 things: 
+		//1. If the vectors are pointing in the same direction = if the dot product is positive
+		//2. If the length of the vector between the intersection and the first point is smaller than the entire line
+		if (Vector2.Dot(ab, ac) > 0f && ab.sqrMagnitude >= ac.sqrMagnitude)
+		{
+			isBetween = true;
+		}
+
+		return isBetween;
 	}
 }
