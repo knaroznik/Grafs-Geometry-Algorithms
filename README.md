@@ -11,8 +11,12 @@ common cases of polygons. After clicking each button u can see how the algorithm
 1. PolygonDrawer - class pin on polygon gameobject. It creates a polygon and draws it on scene.
 1. Dot, Block, Geometry - helper classes, representation of Vector2, Line, and static class for geometry problems.
 
+![](images/nucelus.PNG)
+
 ## Project 2 : Two closest points with Divide and Conquer method.
 Second project, comparasion of divide and conquer algorihtm and brute algorithm.
-
+![](images/closest_points.PNG)
 ## Project 3 : Building Kd-Tree.
+![](images/kd.PNG)
 ## Project 4 : Triangulation of simple polygon using monotone polygons.
+![](images/triangulation.PNG)
