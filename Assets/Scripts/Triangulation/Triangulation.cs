@@ -92,83 +92,97 @@ public class Triangulation : MonoBehaviour {
 	}
 
 	public void Triangulate(){
-		Stack s = new Stack ();
-		s.Push (sortedByX [0]);
-		s.Push (sortedByX [1]);
-		for (int i = 2; i < sortedByX.Count; i++) {
-			if(!sameLane(sortedByX[i], s.Last())){
-				List<GameObject> a = s.ToList ();
+		List<GameObject> stack = new List<GameObject> ();
+		stack.Add (sortedByX [0]);
+		stack.Add (sortedByX [1]);
+
+		for (int i = 2; i < sortedByX.Count-1; i++) {
+			if(!sameLane(sortedByX[i], stack[stack.Count-1])){
+				//Kopiowanie i czyszczenie 
+				Debug.Log("FIRST");
+				List<GameObject> a = new List<GameObject> ();
+				for (int j = 0; j < stack.Count; j++) {
+					a.Add (stack [j]);
+				}
+				stack.Clear ();
+
+				//Zgłaszanie przekątnych
 				for (int j = 1; j < a.Count; j++) {
 					m_printer.PrintLine (linePrefab, 
 						prefabParent.transform, 
 						sortedByX [i].transform.position, 
 						a [j].transform.position, whiteMaterial, 2f, false);
 				}
-				s.Push (a.Last());
-				s.Push (sortedByX [i]);
+
+				//Dodawanie do stosu
+				stack.Add(a[a.Count-1]);
+				stack.Add(sortedByX [i]);
 			}
 			else{
-				GameObject lastObj = null;
-				s.Remove (s.First ());
-				List<GameObject> tmp = new List<GameObject> ();
-				int count = s.Count ();
-				for(int q=0; q<count; q++){
-					lastObj = s.Pop ();
-					if (!IsOutside (lastObj, sortedByX [i], sortedByTime)) {
+				Debug.Log ("SECOND");
+				//Usunięcie ostatniego
+				GameObject lastObj = stack[stack.Count-1];
+
+				stack.RemoveAt (stack.Count-1);
+				int count = stack.Count;
+				//Pętla zgłaszania
+				for(int j=count-1; j>=0; j--){
+					GameObject tmp = stack [j];
+					if (IsInside (tmp, sortedByX [i], sortedByTime)) {
+						lastObj = tmp;
 						m_printer.PrintLine (linePrefab, prefabParent.transform, sortedByX [i].transform.position, lastObj.transform.position, whiteMaterial, 2f, false);
-					} else {
-						tmp.Add (lastObj);
+						stack.RemoveAt (j);
 					}
 				}
 
-				s.Push (tmp);
-				s.Push (lastObj);
-				s.Push (sortedByX [i]);
+				//Dodawanie do stosu
+				stack.Add (lastObj);
+				stack.Add (sortedByX [i]);
 
 			}
-
-			//DebugStack (s.CopyTo());
 		}
 
-//		s.DebugStack ();
-//		s.DeleteFirstAndLast ();
-//		Debug.Log ("NEXT");
-//		s.DebugStack ();
-
-		int x = s.Count ();
+		stack.RemoveAt (0);
+		stack.RemoveAt(stack.Count-1);
+		int x = stack.Count ();
 		for (int i = 0; i < x; i++) {
-			GameObject lastObj = s.Pop ();
+			GameObject lastObj = stack [i];
 			m_printer.PrintLine (linePrefab, prefabParent.transform, 
 				lastObj.transform.position, 
 				sortedByX [sortedByX.Count - 1].transform.position, 
-				whiteMaterial, 2f, false);
+				greenMaterial, 1f, false);
 		}
 	}
 
-
-	private void DebugStack(List<GameObject> stack){
-		for (int i = 0; i < debugList.Count; i++) {
-			Destroy (debugList [i]);
+	private void DebugList(List<GameObject> list){
+		for (int i = 0; i < list.Count; i++) {
+			m_printer.PrintObject (importantPrefab, list[i].transform.position, prefabParent.transform);
 		}
-		debugList.Clear ();
 
-		for (int i = 0; i < stack.Count; i++) {
-			debugList.Add (m_printer.PrintObject (importantPrefab, stack[i].transform.position, prefabParent.transform));
-		}
 	}
 
 
 	private bool sameLane(GameObject x, GameObject y){
+		if (down.Contains (x) && top.Contains (x)) {
+			return false;
+		}
+
+		if (down.Contains (y) && top.Contains (y)) {
+			return false;
+		}
+
 		if (top.Contains (x) && top.Contains (y))
 			return true;
 		if (down.Contains (x) && down.Contains (y))
 			return true;
+
+
 		return false;
 	}
 
-	public bool IsOutside(GameObject lineP1, GameObject lineP2, List<GameObject> region)
+	public bool IsInside(GameObject lineP1, GameObject lineP2, List<GameObject> region)
 	{
-		return !Geometry.LineInsidePolygon (region, false, lineP1, lineP2);
+		return Geometry.LineInsidePolygon (region, false, lineP1, lineP2);
 	}
 
 }

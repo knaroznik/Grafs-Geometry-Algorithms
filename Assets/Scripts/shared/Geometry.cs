@@ -168,10 +168,7 @@ public static class Geometry{
 		Vector2 l1_normal = new Vector2(-l1_dir.y, l1_dir.x);
 		Vector2 l2_normal = new Vector2(-l2_dir.y, l2_dir.x);
 
-		if (IsParallel(l1_normal, l2_normal))
-		{
-			return true;
-		}
+
 
 		//Make sure the denominator is > 0, if so the lines are parallel
 		if (denominator != 0)
@@ -180,12 +177,14 @@ public static class Geometry{
 			float u_b = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
 
 			//Is intersecting if u_a and u_b are between 0 and 1
-			if (u_a >= 0 && u_a <= 1 && u_b >= 0 && u_b <= 1)
+			if (u_a > 0 && u_a < 1 && u_b > 0 && u_b < 1)
 			{
+				//jeśli punkt przecięcia jest dalej niż długość odcinka 
 				isIntersecting = true;
 			}
 		}
 
+		Debug.Log(X.ToString() + " " + Y.ToString() + " " + isIntersecting);
 		return isIntersecting;
 	}
 

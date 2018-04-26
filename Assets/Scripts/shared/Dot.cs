@@ -18,4 +18,16 @@ public class Dot {
 	{
 		return "(" + Math.Round(x, 2).ToString () + "," + Math.Round(y, 2).ToString () + ")";
 	}
+
+	public override bool Equals (object obj)
+	{
+		if (obj.GetType () != this.GetType ()) {
+			return false;
+		}
+		Dot dot = (Dot)obj;
+		if (dot.x == this.x && dot.y == this.y)
+			return true;
+
+		return false;
+	}
 }
