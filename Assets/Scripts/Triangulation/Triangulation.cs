@@ -23,8 +23,6 @@ public class Triangulation : MonoBehaviour {
 	private List<GameObject> top = new List<GameObject>();
 	private List<GameObject> down = new List<GameObject> ();
 
-	private List<GameObject> debugList = new List<GameObject> ();
-
 
 	// Use this for initialization
 	void Start () {
@@ -99,7 +97,6 @@ public class Triangulation : MonoBehaviour {
 		for (int i = 2; i < sortedByX.Count-1; i++) {
 			if(!sameLane(sortedByX[i], stack[stack.Count-1])){
 				//Kopiowanie i czyszczenie 
-				Debug.Log("FIRST");
 				List<GameObject> a = new List<GameObject> ();
 				for (int j = 0; j < stack.Count; j++) {
 					a.Add (stack [j]);
@@ -128,7 +125,7 @@ public class Triangulation : MonoBehaviour {
 				//Pętla zgłaszania
 				for(int j=count-1; j>=0; j--){
 					GameObject tmp = stack [j];
-					if (IsInside (tmp, sortedByX [i], sortedByTime)) {
+					if (IsInside (tmp, sortedByX [i])) {
 						lastObj = tmp;
 						m_printer.PrintLine (linePrefab, prefabParent.transform, sortedByX [i].transform.position, lastObj.transform.position, whiteMaterial, 2f, false);
 						stack.RemoveAt (j);
@@ -180,9 +177,58 @@ public class Triangulation : MonoBehaviour {
 		return false;
 	}
 
-	public bool IsInside(GameObject lineP1, GameObject lineP2, List<GameObject> region)
+	public bool IsInside(GameObject pointA, GameObject pointB)
 	{
-		return Geometry.LineInsidePolygon (region, false, lineP1, lineP2);
+		if (top.Contains (pointA) && top.Contains (pointB)) {
+			int startIndex = top.IndexOf (pointA);
+			int endIndex = top.IndexOf (pointB);
+			List<GameObject> betweenPoints = new List<GameObject> ();
+			for (int i = startIndex+1; i < endIndex; i++) {
+				betweenPoints.Add (top [i]);
+			}
+
+			if (betweenPoints.Count < 1) {
+				return false;
+			}
+
+			for (int i = 0; i < betweenPoints.Count; i++) {
+				if(!isLeft(new Dot(pointA.transform.position.x, pointA.transform.position.y),
+					new Dot(pointB.transform.position.x, pointB.transform.position.y),
+					new Dot(betweenPoints[i].transform.position.x, betweenPoints[i].transform.position.y))){
+					return false;
+				}
+			}
+
+		} else if (down.Contains (pointA) && down.Contains (pointB)) {
+			int startIndex = down.IndexOf (pointA);
+			int endIndex = down.IndexOf (pointB);
+			List<GameObject> betweenPoints = new List<GameObject> ();
+			for (int i = startIndex+1; i < endIndex; i++) {
+				betweenPoints.Add (top [i]);
+			}
+
+			if (betweenPoints.Count < 1) {
+				return false;
+			}
+
+			for (int i = 0; i < betweenPoints.Count; i++) {
+				if(isLeft(new Dot(pointA.transform.position.x, pointA.transform.position.y),
+					new Dot(pointB.transform.position.x, pointB.transform.position.y),
+					new Dot(betweenPoints[i].transform.position.x, betweenPoints[i].transform.position.y))){
+					return false;
+				}
+			}
+		} else {
+			return Geometry.LineInsidePolygon (sortedByTime, true, pointA, pointB);
+		}
+
+
+		return true;
+	}
+
+	//Zwraca true jeśli c jest po lewej od odcinka a-b
+	public bool isLeft(Dot a, Dot b, Dot c){
+		return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 	}
 
 }
